@@ -18,6 +18,7 @@ public class Enemy {
 	public int[] sensorTouching = new int[3];
 	Vector2 lnVel;
 	Vector2 worldCenter;
+	GameScene gs;
 	public void calcVars()
 	{
 		lnVel = body.getLinearVelocity();
@@ -25,6 +26,7 @@ public class Enemy {
 	}
 	public Enemy(GameScene gs, Spawner spawner)
 	{
+		this.gs = gs;
 		for(int i = 0; i < 3; ++i)
 		{
 			sensorTouching[i] = 0;
@@ -62,7 +64,6 @@ public class Enemy {
 		switch(type)
 		{
 		case Sheep:
-			charDesiredVel = flipDir ? -5 : 5;
 			if(sensorTouching[1] > 0)
 				flipDir = false;
 			else if(sensorTouching[2] > 0)
@@ -71,7 +72,19 @@ public class Enemy {
 			{
 				body.applyLinearImpulse(0, 1f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
+			else
+			{
+				charDesiredVel = flipDir ? -5 : 5;
+			}
 			break;
+		case Cup:
+			flipDir = worldCenter.x - gs.character.worldCenter.x > 0;
+			charDesiredVel = flipDir ? -2 : 2;
+			if(Math.abs(gs.character.worldCenter.x - worldCenter.x)  < 5 && (gs.character.worldCenter.y - worldCenter.y) > 1 && sensorTouching[0] > 0)
+			{
+				body.applyLinearImpulse(0, 1f * body.getMass(), worldCenter.x, worldCenter.y, true);
+			}
+			
 		}
 		float velChange = charDesiredVel - lnVel.x;
 		float imp = body.getMass() * velChange;
