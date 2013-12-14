@@ -19,6 +19,7 @@ public class Enemy {
 	Vector2 lnVel;
 	Vector2 worldCenter;
 	GameScene gs;
+	public boolean died;
 	public void calcVars()
 	{
 		lnVel = body.getLinearVelocity();

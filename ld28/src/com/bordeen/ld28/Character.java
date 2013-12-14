@@ -32,13 +32,21 @@ public class Character implements InputProcessor {
 		Ellipse charFlag = ((EllipseMapObject)map.getLayers().get(1).getObjects().get(0)).getEllipse();
 		bd.position.x = charFlag.x * GameScene.unitScale;
 		bd.position.y = charFlag.y * GameScene.unitScale;
-		PolygonShape ps = new PolygonShape();
-		ps.setAsBox(0.315f, 0.49f);
+		
 		body = world.createBody(bd);
 		body.setUserData(this);
-		body.createFixture(ps, 2);
+		
+		PolygonShape ps = new PolygonShape();
+		ps.setAsBox(0.315f, 0.49f * 0.80f, new Vector2(0, 0.49f * 0.2f), 0);
+		Fixture f = body.createFixture(ps, 2);
+		f.setUserData(new Integer(0));
+		
+		ps.setAsBox(0.31f, 0.49f * 0.20f, new Vector2(0, -0.49f * 0.8f), 0);
+		f = body.createFixture(ps, 2);
+		f.setUserData(new Integer(1));
+		
 		ps.setAsBox(0.2f, 0.1f, new Vector2(0f, -0.49f), 0);
-		Fixture f = body.createFixture(ps, 1);
+		f = body.createFixture(ps, 1);
 		f.setSensor(true);
 		ps.dispose();
 	}
@@ -86,6 +94,7 @@ public class Character implements InputProcessor {
 	}
 	boolean flipX = false;
 	float jumpTimeout = 0;
+	public boolean died = false;
 	@Override
 	public boolean keyDown(int keycode) {
 		switch(keycode)

@@ -1,6 +1,8 @@
 package com.bordeen.ld28;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -16,9 +18,10 @@ public class CCL implements ContactListener {
 		{
 			if(bodyA.getUserData().getClass() == Character.class)
 			{
+				Character character = ((Character)bodyA.getUserData()); 
 				if(contact.getFixtureA().isSensor())
 				{
-					((Character)bodyA.getUserData()).footTouching++;
+					character.footTouching++;	
 				}
 				else
 				{
@@ -29,13 +32,21 @@ public class CCL implements ContactListener {
 							Clock ck = (Clock)bodyB.getUserData();
 							ck.catched = true;
 						}
+						else if(bodyB.getUserData().getClass() == Enemy.class)
+						{
+							int index = (Integer)contact.getFixtureA().getUserData();
+							if(index == 0)
+								character.died = true;
+							else if (index == 1)
+								((Enemy)bodyB.getUserData()).died = true;
+						}
 					}
 				}
 			}
 			else if(bodyA.getUserData().getClass() == Enemy.class)
 			{
 				Enemy e = (Enemy)bodyA.getUserData();
-				if(contact.getFixtureA().isSensor())
+				if(contact.getFixtureA().isSensor() && !contact.getFixtureB().isSensor())
 				{
 					int index = (Integer)contact.getFixtureA().getUserData();
 					e.sensorTouching[index]++;
@@ -46,9 +57,10 @@ public class CCL implements ContactListener {
 		{
 			if(bodyB.getUserData().getClass() == Character.class)
 			{
+				Character character = (Character)bodyB.getUserData();
 				if(contact.getFixtureB().isSensor())
 				{
-					((Character)bodyB.getUserData()).footTouching++;
+					character.footTouching++;
 				}
 				else
 				{
@@ -59,12 +71,20 @@ public class CCL implements ContactListener {
 							Clock ck = (Clock)bodyA.getUserData();
 							ck.catched = true;
 						}
+						else if(bodyA.getUserData().getClass() == Enemy.class)
+						{
+							int index = (Integer)contact.getFixtureB().getUserData();
+							if(index == 0)
+								character.died = true;
+							else if (index == 1)
+								((Enemy)bodyA.getUserData()).died = true;
+						}
 					}
 				}
 			}
 			else if(bodyB.getUserData().getClass() == Enemy.class)
 			{
-				if(contact.getFixtureB().isSensor())
+				if(contact.getFixtureB().isSensor() && !contact.getFixtureA().isSensor())
 				{
 					int index = (Integer)contact.getFixtureB().getUserData();
 					((Enemy)bodyB.getUserData()).sensorTouching[index]++;
@@ -89,7 +109,7 @@ public class CCL implements ContactListener {
 			else if(bodyA.getUserData().getClass() == Enemy.class)
 			{
 				Enemy e = (Enemy)bodyA.getUserData();
-				if(contact.getFixtureA().isSensor())
+				if(contact.getFixtureA().isSensor() && !contact.getFixtureB().isSensor())
 				{
 					e.sensorTouching[(Integer)contact.getFixtureA().getUserData()]--;
 				}
@@ -106,7 +126,7 @@ public class CCL implements ContactListener {
 			}
 			else if(bodyB.getUserData().getClass() == Enemy.class)
 			{
-				if(contact.getFixtureB().isSensor())
+				if(contact.getFixtureB().isSensor() && !contact.getFixtureA().isSensor())
 				{
 					((Enemy)bodyB.getUserData()).sensorTouching[(Integer)contact.getFixtureB().getUserData()]--;
 				}

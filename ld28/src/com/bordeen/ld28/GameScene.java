@@ -284,6 +284,12 @@ public class GameScene extends Scene implements InputProcessor {
 		batch.end();
 		
 		character.update(dt);
+		if(character.died)
+		{
+			end();
+			start(assetManager);
+			return;
+		}
 
 		for(int i = 0; i < enemies.size; ++i)
 		{
@@ -314,7 +320,7 @@ public class GameScene extends Scene implements InputProcessor {
 			return;
 		}
 		
-		//physicsRenderer.render(world, camera.combined);
+		physicsRenderer.render(world, camera.combined);
 		
 		world.step(dt, 2, 4);
 	}
