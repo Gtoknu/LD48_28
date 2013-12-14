@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -49,11 +50,20 @@ public class GameScene extends Scene implements InputProcessor {
 	float cameraMax;
 	int currentLevel = 1;
 	AssetManager assetManager;
+	TextureRegion[] backs;
+	float backCounting = 0;
+	int backIndex = 0;
 	@Override
 	public void start(AssetManager assetManager) {
 		this.assetManager = assetManager;
 		characterSheet = assetManager.get("data/character.png", Texture.class);
 		clock = assetManager.get("data/clock.png", Texture.class);
+		Texture backSheet = assetManager.get("data/background.png", Texture.class);
+		backs = new TextureRegion[]
+				{
+					new TextureRegion(backSheet, 0, 0, 640, 448),
+					new TextureRegion(backSheet, 0, 448, 640, 448),
+				};
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 		world = new World(new Vector2(0, -10), true);
 		world.setContactListener(new CCL());
@@ -129,6 +139,7 @@ public class GameScene extends Scene implements InputProcessor {
 	public void load(AssetManager assetManager) {
 		assetManager.load("data/character.png", Texture.class);
 		assetManager.load("data/clock.png", Texture.class);
+		assetManager.load("data/background.png", Texture.class);
 	}
 	@Override
 	public void end() {
@@ -144,15 +155,34 @@ public class GameScene extends Scene implements InputProcessor {
 		// TODO Auto-generated method stub
 		super.dispose();
 	}
+	final static float bpm = 80;
+	final static float bps = bpm/60;
 	@Override
 	public void render() {
+		float dt = 1f/45f;
 		Gdx.gl.glClearColor(0.2f, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		character.calcVars();
+
+		backCounting += dt;
+		if(backCounting >= bps)
+		{
+			backCounting -= bps;
+			backIndex = (backIndex+1) % backs.length;
+		}
+		
+		batch.setProjectionMatrix(camera.combined);
+		
+		batch.disableBlending();
+		batch.begin();
+		batch.draw(backs[backIndex], 0, 0, 0, 0, backs[backIndex].getRegionWidth() * unitScale, backs[backIndex].getRegionHeight() * unitScale, 1, 1, 0);
+		batch.end();
+		batch.enableBlending();
 		
 		mapRenderer.setView(camera);
 		mapRenderer.render();
+		
 		batch.begin();
 		character.draw(batch);
 		
@@ -164,7 +194,7 @@ public class GameScene extends Scene implements InputProcessor {
 		}
 		batch.end();
 		
-		character.update();
+		character.update(dt);
 		
 		camera.position.x = Math.max(cameraMin, Math.min(cameraMax, character.pos.x));
 		camera.update();
@@ -187,7 +217,7 @@ public class GameScene extends Scene implements InputProcessor {
 			return;
 		}
 		
-		physicsRenderer.render(world, camera.combined);
+		//physicsRenderer.render(world, camera.combined);
 		
 		world.step(1f/45f, 2, 4);
 	}

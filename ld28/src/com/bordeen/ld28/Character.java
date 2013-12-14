@@ -62,7 +62,7 @@ public class Character implements InputProcessor {
 	final static int KRIGHT = 0x2;
 	final static int KUP = 0x4;
 	final static int KDOWN = 0x8;
-	void update()
+	void update(float dt)
 	{
 		float charDesiredVel = 0;
 		switch(keyState & (KLEFT | KRIGHT))
@@ -75,8 +75,17 @@ public class Character implements InputProcessor {
 		float velChange = charDesiredVel - lnVel.x;
 		float imp = body.getMass() * velChange;
 		body.applyLinearImpulse(imp, 0, worldCenter.x, worldCenter.y, true);
+		if(jumpTimeout > 0)
+		{
+			jumpTimeout -= dt;
+			if((keyState & KUP) == KUP)
+			{
+				body.applyLinearImpulse(0, 0.15f * body.getMass() * jumpTimeout, worldCenter.x, worldCenter.y, true);
+			}
+		}
 	}
 	boolean flipX = false;
+	float jumpTimeout = 0;
 	@Override
 	public boolean keyDown(int keycode) {
 		switch(keycode)
@@ -88,9 +97,10 @@ public class Character implements InputProcessor {
 			keyState |= KRIGHT;  flipX = false; break;
 
 		case Keys.UP:
-			if(footTouching > 0)
+			if(footTouching > 0f && jumpTimeout <= 0.8f)
 			{
-				body.applyLinearImpulse(0, 6 * body.getMass(), worldCenter.x, worldCenter.y, true);
+				body.applyLinearImpulse(0, 4f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				jumpTimeout = 1.0f;
 			}
 			keyState |= KUP;
 			break;
