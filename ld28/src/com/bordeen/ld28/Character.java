@@ -17,6 +17,11 @@ import com.badlogic.gdx.physics.box2d.World;
 public class Character implements InputProcessor {
 	Body body;
 	Texture sheet;
+	/**
+	 * @param map
+	 * @param world
+	 * @param sheet
+	 */
 	void create(TiledMap map, World world, Texture sheet)
 	{
 		this.sheet = sheet;
@@ -29,6 +34,7 @@ public class Character implements InputProcessor {
 		PolygonShape ps = new PolygonShape();
 		ps.setAsBox(0.315f, 0.49f);
 		body = world.createBody(bd);
+		body.setUserData(this);
 		body.createFixture(ps, 2);
 		ps.dispose();
 	}

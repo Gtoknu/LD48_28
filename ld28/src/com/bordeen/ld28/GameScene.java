@@ -16,6 +16,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -44,21 +45,26 @@ public class GameScene extends Scene implements InputProcessor {
 	Array<Body> clocks = new Array<Body>(false, 5);
 	//final static float unitScale = 5f;
 	Texture clock;
+	float cameraMin;
+	float cameraMax;
 	@Override
 	public void start(AssetManager assetManager) {
 		characterSheet = assetManager.get("data/character.png", Texture.class);
 		clock = assetManager.get("data/clock.png", Texture.class);
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 		world = new World(new Vector2(0, -10), true);
+		world.setContactListener(new CCL());
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(12 * w/h, 12);
-		camera.position.set(camera.viewportWidth/2f, 6, 0);
+		camera.position.set(cameraMin = camera.viewportWidth/2f, 6, 0);
 		camera.update();
 		
 		batch = new SpriteBatch();
 		map = new TmxMapLoader().load("data/mapa1.tmx");
+		cameraMax = cameraMin + ((TiledMapTileLayer)map.getLayers().get(2)).getWidth();
 		MapLayer layer = map.getLayers().get(0);
+		
 		MapObjects objs = layer.getObjects();
 		Iterator<MapObject> objIt = objs.iterator();
 		Vector2 tmp = new Vector2();
@@ -98,6 +104,7 @@ public class GameScene extends Scene implements InputProcessor {
 				bd.position.scl(unitScale);
 				ps.setAsBox(0.5f, 0.5f);
 				Body b = world.createBody(bd);
+				b.setUserData(new Clock());
 				clocks.add(b);
 				Fixture f = b.createFixture(ps, 1);
 				f.setSensor(true);
@@ -156,7 +163,25 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		character.update();
 		
-		physicsRenderer.render(world, camera.combined);
+		camera.position.x = Math.max(cameraMin, Math.min(cameraMax, character.pos.x));
+		camera.update();
+		
+		for(int i = clocks.size-1; i >= 0; --i)
+		{
+			Body b = clocks.get(i);
+			Clock c = (Clock)b.getUserData();
+			if(c.catched)
+			{
+				clocks.removeIndex(i);
+				world.destroyBody(b);
+			}
+		}
+		if(clocks.size <= 0)
+		{
+			//endlevel
+		}
+		
+		//physicsRenderer.render(world, camera.combined);
 		
 		world.step(1f/45f, 2, 4);
 	}
