@@ -33,7 +33,7 @@
   </object>
   <object name="Spawn1" x="784" y="272">
    <properties>
-    <property name="enemy" value="cup"/>
+    <property name="enemy" value="pillow"/>
     <property name="interval" value="3"/>
     <property name="maximum" value="3"/>
     <property name="onlyClose" value="0"/>

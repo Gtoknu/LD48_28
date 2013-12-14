@@ -84,6 +84,30 @@ public class Enemy {
 			{
 				body.applyLinearImpulse(0, 1f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
+			break;
+		case Pillow:
+			if(sensorTouching[1] > 0)
+				flipDir = false;
+			else if(sensorTouching[2] > 0)
+				flipDir = true;
+			float rel = gs.character.worldCenter.x - worldCenter.x;
+			if(Math.abs(rel) < 2)
+			{
+				if( Math.signum(rel) == (flipDir ? 1 : -1) )
+					charDesiredVel = flipDir ? -1 : 1;
+				
+				if(Math.abs(rel) < 1.5f)
+				{
+					flipDir = rel < 0;
+					charDesiredVel = flipDir ? -0.5f : 0.5f;
+					if(sensorTouching[0] > 0)
+						body.applyLinearImpulse(0, 1.1f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				}
+			}
+			else
+			{
+				charDesiredVel = flipDir ? -1 : 1;
+			}
 			
 		}
 		float velChange = charDesiredVel - lnVel.x;

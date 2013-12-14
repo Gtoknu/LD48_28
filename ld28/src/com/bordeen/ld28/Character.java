@@ -80,7 +80,7 @@ public class Character implements InputProcessor {
 			jumpTimeout -= dt;
 			if((keyState & KUP) == KUP)
 			{
-				body.applyLinearImpulse(0, 0.15f * body.getMass() * jumpTimeout, worldCenter.x, worldCenter.y, true);
+				body.applyLinearImpulse(0, 0.125f * body.getMass() * jumpTimeout, worldCenter.x, worldCenter.y, true);
 			}
 		}
 	}
@@ -99,7 +99,7 @@ public class Character implements InputProcessor {
 		case Keys.UP:
 			if(footTouching > 0f && jumpTimeout <= 0.8f)
 			{
-				body.applyLinearImpulse(0, 4f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				body.applyLinearImpulse(0, 3.5f * body.getMass(), worldCenter.x, worldCenter.y, true);
 				jumpTimeout = 1.0f;
 			}
 			keyState |= KUP;
