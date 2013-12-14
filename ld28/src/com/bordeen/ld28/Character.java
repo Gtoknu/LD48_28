@@ -37,7 +37,7 @@ public class Character implements InputProcessor {
 		body = world.createBody(bd);
 		body.setUserData(this);
 		body.createFixture(ps, 2);
-		ps.setAsBox(0.15f, 0.1f, new Vector2(0f, -0.49f), 0);
+		ps.setAsBox(0.2f, 0.1f, new Vector2(0f, -0.49f), 0);
 		Fixture f = body.createFixture(ps, 1);
 		f.setSensor(true);
 		ps.dispose();

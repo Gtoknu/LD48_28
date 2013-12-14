@@ -32,6 +32,15 @@ public class CCL implements ContactListener {
 					}
 				}
 			}
+			else if(bodyA.getUserData().getClass() == Enemy.class)
+			{
+				Enemy e = (Enemy)bodyA.getUserData();
+				if(contact.getFixtureA().isSensor())
+				{
+					int index = (Integer)contact.getFixtureA().getUserData();
+					e.sensorTouching[index]++;
+				}
+			}
 		}
 		if(bodyB.getUserData() != null)
 		{
@@ -53,6 +62,14 @@ public class CCL implements ContactListener {
 					}
 				}
 			}
+			else if(bodyB.getUserData().getClass() == Enemy.class)
+			{
+				if(contact.getFixtureB().isSensor())
+				{
+					int index = (Integer)contact.getFixtureB().getUserData();
+					((Enemy)bodyB.getUserData()).sensorTouching[index]++;
+				}
+			}
 		}
 	}
 
@@ -69,6 +86,14 @@ public class CCL implements ContactListener {
 					((Character)bodyA.getUserData()).footTouching--;
 				}
 			}
+			else if(bodyA.getUserData().getClass() == Enemy.class)
+			{
+				Enemy e = (Enemy)bodyA.getUserData();
+				if(contact.getFixtureA().isSensor())
+				{
+					e.sensorTouching[(Integer)contact.getFixtureA().getUserData()]--;
+				}
+			}
 		}
 		if(bodyB != null && bodyB.getUserData() != null)
 		{
@@ -77,6 +102,13 @@ public class CCL implements ContactListener {
 				if(contact.getFixtureB().isSensor())
 				{
 					((Character)bodyB.getUserData()).footTouching--;
+				}
+			}
+			else if(bodyB.getUserData().getClass() == Enemy.class)
+			{
+				if(contact.getFixtureB().isSensor())
+				{
+					((Enemy)bodyB.getUserData()).sensorTouching[(Integer)contact.getFixtureB().getUserData()]--;
 				}
 			}
 		}

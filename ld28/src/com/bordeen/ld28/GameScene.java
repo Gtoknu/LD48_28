@@ -170,6 +170,21 @@ public class GameScene extends Scene implements InputProcessor {
 				spawners.add(s);
 			}
 		}
+		
+		bd.type = BodyType.StaticBody;
+		bd.position.set(-0.5f, 10);
+		Body bound = world.createBody(bd);
+		ps.setAsBox(0.5f, 20);
+		Fixture f = bound.createFixture(ps, 1);
+		f.setFriction(0);
+		f.setRestitution(0.1f);
+		bd.position.set(mapWidth+0.5f, 10);
+		bound = world.createBody(bd);
+		ps.setAsBox(0.5f, 20);
+		f = bound.createFixture(ps, 1);
+		f.setFriction(0);
+		f.setRestitution(0.1f);
+		
 		ps.dispose();
 		character = new Character();
 		character.create(map, world, characterSheet);
@@ -218,6 +233,10 @@ public class GameScene extends Scene implements InputProcessor {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		character.calcVars();
+		for(int i = 0; i < enemies.size; ++i)
+		{
+			enemies.get(i).calcVars();
+		}
 
 		backCounting += dt;
 		if(backCounting >= spb)
@@ -265,6 +284,11 @@ public class GameScene extends Scene implements InputProcessor {
 		batch.end();
 		
 		character.update(dt);
+
+		for(int i = 0; i < enemies.size; ++i)
+		{
+			enemies.get(i).update();
+		}
 		
 		camera.position.x = Math.max(cameraMin, Math.min(cameraMax, character.pos.x));
 		camera.update();
@@ -290,7 +314,7 @@ public class GameScene extends Scene implements InputProcessor {
 			return;
 		}
 		
-		physicsRenderer.render(world, camera.combined);
+		//physicsRenderer.render(world, camera.combined);
 		
 		world.step(dt, 2, 4);
 	}
