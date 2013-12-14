@@ -54,7 +54,9 @@ public class GameScene extends Scene implements InputProcessor {
 	float backCounting = 0;
 	int backIndex = 0;
 	TextureRegion[] fends;
+	TextureRegion[] enemyTR;
 	private Array<Spawner> spawners;
+	int mapWidth;
 	@Override
 	public void start(AssetManager assetManager) {
 		this.assetManager = assetManager;
@@ -65,7 +67,7 @@ public class GameScene extends Scene implements InputProcessor {
 		backs = new TextureRegion[]
 				{
 					new TextureRegion(backSheet, 0, 0, 640, 448),
-					new TextureRegion(backSheet, 0, 448, 640, 448),
+					new TextureRegion(backSheet, 0, 448, 640, 448)
 				};
 		Texture fendSheet = assetManager.get("data/fend.png", Texture.class);
 		fends = new TextureRegion[]
@@ -75,7 +77,14 @@ public class GameScene extends Scene implements InputProcessor {
 					new TextureRegion(fendSheet, 68, 0, 32, 32),
 					new TextureRegion(fendSheet, 0, 34, 32, 32),
 					new TextureRegion(fendSheet, 34, 34, 32, 32),
-					new TextureRegion(fendSheet, 0, 68, 32, 32),
+					new TextureRegion(fendSheet, 0, 68, 32, 32)
+				};
+		Texture enemySheet = assetManager.get("data/enemies.png", Texture.class);
+		enemyTR = new TextureRegion[]
+				{
+				new TextureRegion(enemySheet, 34, 0, 14, 28),
+				new TextureRegion(enemySheet, 0, 22, 25, 32),
+				new TextureRegion(enemySheet, 0, 0, 32, 20)
 				};
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 		world = new World(new Vector2(0, -10), true);
@@ -88,7 +97,8 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		batch = new SpriteBatch();
 		map = new TmxMapLoader().load("data/mapa" + currentLevel +".tmx");
-		cameraMax = cameraMin+((TiledMapTileLayer)map.getLayers().get(2)).getWidth() - camera.viewportWidth;
+		mapWidth = ((TiledMapTileLayer)map.getLayers().get(2)).getWidth();
+		cameraMax = cameraMin + mapWidth - camera.viewportWidth;
 		MapLayer layer = map.getLayers().get(0);
 		
 		MapObjects objs = layer.getObjects();
@@ -146,16 +156,17 @@ public class GameScene extends Scene implements InputProcessor {
 				String enemy = props.get("enemy", String.class);
 				if(enemy.compareTo("cup") == 0)
 				{
-					s.enemy = Enemy.Cup;
+					s.enemy = Enemies.Cup;
 				}
 				else if(enemy.compareTo("pillow") == 0)
 				{
-					s.enemy = Enemy.Pillow;
+					s.enemy = Enemies.Pillow;
 				}
 				else if(enemy.compareTo("sheep") == 0)
 				{
-					s.enemy = Enemy.Sheep;
+					s.enemy = Enemies.Sheep;
 				}
+				s.start(this);
 				spawners.add(s);
 			}
 		}
@@ -177,6 +188,7 @@ public class GameScene extends Scene implements InputProcessor {
 		assetManager.load("data/clock.png", Texture.class);
 		assetManager.load("data/background.png", Texture.class);
 		assetManager.load("data/fend.png", Texture.class);
+		assetManager.load("data/enemies.png", Texture.class);
 	}
 	@Override
 	public void end() {
@@ -192,21 +204,23 @@ public class GameScene extends Scene implements InputProcessor {
 		// TODO Auto-generated method stub
 		super.dispose();
 	}
-	final static float bpm = 80;
-	final static float bps = bpm/60;
+	public final static float bpm = 80f;
+	public final static float bps = bpm/60f;
+	public final static float spb = 1f/bps;
 	float time = 0;
 	@Override
 	public void render() {
-		float dt = 1f/45f;
+		//float dt = 1f/45f;
+		float dt = Math.min(1f/45f, Gdx.graphics.getDeltaTime());
 		Gdx.gl.glClearColor(0.2f, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		character.calcVars();
 
 		backCounting += dt;
-		if(backCounting >= bps)
+		if(backCounting >= spb)
 		{
-			backCounting -= bps;
+			backCounting -= spb;
 			backIndex = (backIndex+1) % backs.length;
 		}
 		
@@ -214,16 +228,23 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		batch.disableBlending();
 		batch.begin();
-		batch.draw(backs[backIndex], 0, 0, 0, 0, backs[backIndex].getRegionWidth() * unitScale, backs[backIndex].getRegionHeight() * unitScale, 1, 1, 0);
+		for(int x = 0; x < mapWidth; x += backs[0].getRegionWidth() * unitScale)
+		{
+			batch.draw(backs[backIndex], x, 0, 0, 0, backs[backIndex].getRegionWidth() * unitScale, backs[backIndex].getRegionHeight() * unitScale, 1, 1, 0);
+		}
 		batch.end();
 		batch.enableBlending();
 		
 		batch.begin();
-		time = (time+dt) % fends.length;
 		for(int i = 0; i < spawners.size; ++i)
 		{
 			Spawner s = spawners.get(i);
-			batch.draw(fends[(int)time], s.position.x - 0.5f, s.position.y - 0.5f, 1, 1);
+			batch.draw(fends[(int)(Math.min(s.anim * fends.length, fends.length-1))], s.position.x - 0.5f, s.position.y - 0.5f, 1, 1);
+		}
+		for(int i = 0; i < enemies.size; ++i)
+		{
+			Enemy e = enemies.get(i);
+			e.render(batch);
 		}
 		batch.end();
 		
@@ -245,7 +266,10 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		camera.position.x = Math.max(cameraMin, Math.min(cameraMax, character.pos.x));
 		camera.update();
-		
+		for(int i = 0; i < spawners.size; ++i)
+		{
+			spawners.get(i).update(dt);
+		}
 		for(int i = clocks.size-1; i >= 0; --i)
 		{
 			Body b = clocks.get(i);
@@ -266,7 +290,7 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		//physicsRenderer.render(world, camera.combined);
 		
-		world.step(1f/45f, 2, 4);
+		world.step(dt, 2, 4);
 	}
 	
 	int keyState = 0;
@@ -308,6 +332,12 @@ public class GameScene extends Scene implements InputProcessor {
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	Array<Enemy> enemies = new Array<Enemy>(false, 15);
+	public Enemy createEnemy(Spawner spawner) {
+		Enemy e = new Enemy(this, spawner);
+		enemies.add(e);
+		return e;
 	}
 	
 
