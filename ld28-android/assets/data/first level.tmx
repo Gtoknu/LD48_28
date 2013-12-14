@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="100" height="24" tilewidth="16" tileheight="16">
  <tileset firstgid="1" name="pickleTile" tilewidth="16" tileheight="16">
-  <image source="Users/Adriana/Desktop/pickleTile.png" width="256" height="16"/>
+  <image source="pickleTile.png" width="256" height="16"/>
   <terraintypes>
    <terrain name="Novo Terreno" tile="-1"/>
   </terraintypes>
