@@ -44,11 +44,9 @@ public class Character implements InputProcessor {
 	
 	void draw(SpriteBatch batch)
 	{
-		batch.begin();
 		batch.draw(sheet, pos.x - 0.5f, pos.y - 0.5f, 1, 1, 0, 0, 32, 32, flipX, false);
-		batch.end();
 	}
-	int keyState;
+	int keyState = 0;
 	final static int KLEFT = 0x1;
 	final static int KRIGHT = 0x2;
 	final static int KUP = 0x4;

@@ -20,4 +20,11 @@
    eJzt0c0KABAQReHZWfl5/6clURILJaPmfHV3FpMjAgAAANjmymKZ1z4EtUVqC8q3WDe2oIeuuQU93oibzS36Vm9xz+7fT4Z76PGXDO+ABBg=
   </data>
  </layer>
+ <objectgroup name="Objects" width="100" height="14">
+  <object x="528" y="336">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

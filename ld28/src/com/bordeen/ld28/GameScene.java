@@ -5,9 +5,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,19 +13,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
-import com.badlogic.gdx.maps.objects.CircleMapObject;
-import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -35,9 +25,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class GameScene extends Scene implements InputProcessor {
 	private OrthographicCamera camera;
@@ -51,10 +41,13 @@ public class GameScene extends Scene implements InputProcessor {
 	Texture characterSheet;
 	Character character;
 	InputMultiplexer imux;
+	Array<Body> clocks = new Array<Body>(false, 5);
 	//final static float unitScale = 5f;
+	Texture clock;
 	@Override
 	public void start(AssetManager assetManager) {
 		characterSheet = assetManager.get("data/character.png", Texture.class);
+		clock = assetManager.get("data/clock.png", Texture.class);
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 		world = new World(new Vector2(0, -10), true);
 		float w = Gdx.graphics.getWidth();
@@ -87,6 +80,30 @@ public class GameScene extends Scene implements InputProcessor {
 				ps.dispose();
 			}
 		}
+		
+		layer = map.getLayers().get(3);
+		objs = layer.getObjects();
+		objIt = objs.iterator();
+		PolygonShape ps = new PolygonShape();
+		while(objIt.hasNext())
+		{
+			MapObject obj = objIt.next();
+			MapProperties props = obj.getProperties();
+			String type = props.get("type", String.class);
+			if(type == null) continue;
+			if(type.compareTo("clock") == 0)
+			{
+				bd.type = BodyType.KinematicBody;
+				((RectangleMapObject)obj).getRectangle().getCenter(bd.position);
+				bd.position.scl(unitScale);
+				ps.setAsBox(0.5f, 0.5f);
+				Body b = world.createBody(bd);
+				clocks.add(b);
+				Fixture f = b.createFixture(ps, 1);
+				f.setSensor(true);
+			}
+		}
+		ps.dispose();
 		character = new Character();
 		character.create(map, world, characterSheet);
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale, batch);
@@ -101,6 +118,7 @@ public class GameScene extends Scene implements InputProcessor {
 	@Override
 	public void load(AssetManager assetManager) {
 		assetManager.load("data/character.png", Texture.class);
+		assetManager.load("data/clock.png", Texture.class);
 	}
 	@Override
 	public void end() {
@@ -125,10 +143,20 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		mapRenderer.setView(camera);
 		mapRenderer.render();
+		batch.begin();
 		character.draw(batch);
+		
+		for(int i = 0; i < clocks.size; ++i)
+		{
+			Body b = clocks.get(i);
+			Vector2 p = b.getPosition();
+			batch.draw(clock, p.x - 0.5f, p.y - 0.5f, 1, 1);
+		}
+		batch.end();
+		
 		character.update();
 		
-		//physicsRenderer.render(world, camera.combined);
+		physicsRenderer.render(world, camera.combined);
 		
 		world.step(1f/45f, 2, 4);
 	}
