@@ -16,12 +16,19 @@ public class CCL implements ContactListener {
 		{
 			if(bodyA.getUserData().getClass() == Character.class)
 			{
-				if(bodyB.getUserData() != null)
+				if(contact.getFixtureA().isSensor())
 				{
-					if(bodyB.getUserData().getClass() == Clock.class)
+					((Character)bodyA.getUserData()).footTouching++;
+				}
+				else
+				{
+					if(bodyB.getUserData() != null)
 					{
-						Clock ck = (Clock)bodyB.getUserData();
-						ck.catched = true;
+						if(bodyB.getUserData().getClass() == Clock.class)
+						{
+							Clock ck = (Clock)bodyB.getUserData();
+							ck.catched = true;
+						}
 					}
 				}
 			}
@@ -30,12 +37,19 @@ public class CCL implements ContactListener {
 		{
 			if(bodyB.getUserData().getClass() == Character.class)
 			{
-				if(bodyA.getUserData() != null)
+				if(contact.getFixtureB().isSensor())
 				{
-					if(bodyA.getUserData().getClass() == Clock.class)
-					{
-						Clock ck = (Clock)bodyA.getUserData();
-						ck.catched = true;
+					((Character)bodyB.getUserData()).footTouching++;
+				}
+				else
+				{
+					if(bodyA.getUserData() != null)
+					{	
+						if(bodyA.getUserData().getClass() == Clock.class)
+						{
+							Clock ck = (Clock)bodyA.getUserData();
+							ck.catched = true;
+						}
 					}
 				}
 			}
@@ -44,8 +58,28 @@ public class CCL implements ContactListener {
 
 	@Override
 	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
-
+		Body bodyA = contact.getFixtureA() != null ? contact.getFixtureA().getBody() : null;
+		Body bodyB = contact.getFixtureB() != null ? contact.getFixtureB().getBody() : null;
+		if(bodyA != null && bodyA.getUserData() != null)
+		{
+			if(bodyA.getUserData().getClass() == Character.class)
+			{
+				if(contact.getFixtureA().isSensor())
+				{
+					((Character)bodyA.getUserData()).footTouching--;
+				}
+			}
+		}
+		if(bodyB != null && bodyB.getUserData() != null)
+		{
+			if(bodyB.getUserData().getClass() == Character.class)
+			{
+				if(contact.getFixtureB().isSensor())
+				{
+					((Character)bodyB.getUserData()).footTouching--;
+				}
+			}
+		}
 	}
 
 	@Override

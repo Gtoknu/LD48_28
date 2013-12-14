@@ -47,8 +47,11 @@ public class GameScene extends Scene implements InputProcessor {
 	Texture clock;
 	float cameraMin;
 	float cameraMax;
+	int currentLevel = 1;
+	AssetManager assetManager;
 	@Override
 	public void start(AssetManager assetManager) {
+		this.assetManager = assetManager;
 		characterSheet = assetManager.get("data/character.png", Texture.class);
 		clock = assetManager.get("data/clock.png", Texture.class);
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
@@ -61,7 +64,7 @@ public class GameScene extends Scene implements InputProcessor {
 		camera.update();
 		
 		batch = new SpriteBatch();
-		map = new TmxMapLoader().load("data/mapa1.tmx");
+		map = new TmxMapLoader().load("data/mapa" + currentLevel +".tmx");
 		cameraMax = cameraMin + ((TiledMapTileLayer)map.getLayers().get(2)).getWidth();
 		MapLayer layer = map.getLayers().get(0);
 		
@@ -178,10 +181,13 @@ public class GameScene extends Scene implements InputProcessor {
 		}
 		if(clocks.size <= 0)
 		{
-			//endlevel
+			currentLevel++;
+			end();
+			start(assetManager);
+			return;
 		}
 		
-		//physicsRenderer.render(world, camera.combined);
+		physicsRenderer.render(world, camera.combined);
 		
 		world.step(1f/45f, 2, 4);
 	}

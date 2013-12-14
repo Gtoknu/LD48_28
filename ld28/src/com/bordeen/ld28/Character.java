@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
@@ -36,8 +37,12 @@ public class Character implements InputProcessor {
 		body = world.createBody(bd);
 		body.setUserData(this);
 		body.createFixture(ps, 2);
+		ps.setAsBox(0.15f, 0.1f, new Vector2(0f, -0.49f), 0);
+		Fixture f = body.createFixture(ps, 1);
+		f.setSensor(true);
 		ps.dispose();
 	}
+	int footTouching = 0;
 	Vector2 pos;
 	Vector2 lnVel;
 	Vector2 worldCenter;
@@ -83,7 +88,10 @@ public class Character implements InputProcessor {
 			keyState |= KRIGHT;  flipX = false; break;
 
 		case Keys.UP:
-			body.applyLinearImpulse(0, 5 * body.getMass(), worldCenter.x, worldCenter.y, true);
+			if(footTouching > 0)
+			{
+				body.applyLinearImpulse(0, 6 * body.getMass(), worldCenter.x, worldCenter.y, true);
+			}
 			keyState |= KUP;
 			break;
 		case Keys.DOWN:
