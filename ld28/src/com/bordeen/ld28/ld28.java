@@ -35,6 +35,8 @@ public class ld28 implements ApplicationListener {
 			e.value.load(assetManager);
 		}
 		
+		assetManager.finishLoading();
+		
 		currentScene.start(assetManager);
 	}
 
