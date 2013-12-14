@@ -34,6 +34,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -80,7 +81,9 @@ public class GameScene extends Scene implements InputProcessor {
 				PolygonShape ps = new PolygonShape();
 				ps.setAsBox(rect.getWidth() * unitScale / 2f, rect.getHeight() * unitScale/ 2f, rect.getCenter(tmp).scl(unitScale), 0);
 				Body nb = world.createBody(bd);
-				nb.createFixture(ps, 1);
+				Fixture f = nb.createFixture(ps, 1);
+				f.setRestitution(0.3f);
+				f.setFriction(0f);
 				ps.dispose();
 			}
 		}

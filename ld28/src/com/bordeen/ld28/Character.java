@@ -27,7 +27,7 @@ public class Character implements InputProcessor {
 		bd.position.x = charFlag.x * GameScene.unitScale;
 		bd.position.y = charFlag.y * GameScene.unitScale;
 		PolygonShape ps = new PolygonShape();
-		ps.setAsBox(0.5f, 0.5f);
+		ps.setAsBox(0.315f, 0.49f);
 		body = world.createBody(bd);
 		body.createFixture(ps, 2);
 		ps.dispose();
