@@ -24,10 +24,10 @@ public class ld28 implements ApplicationListener {
 	Scene currentScene = null;
 	@Override
 	public void create() {		
+		assetManager = new AssetManager();
 		currentScene = scenes.put("Main Menu", new MainMenu());
 		scenes.put("Game", new GameScene());
 		currentScene = scenes.get("Game");
-		currentScene.start();
 		Iterator<Entry<String, Scene>> entries = scenes.entries().iterator();
 		while(entries.hasNext())
 		{
@@ -35,7 +35,7 @@ public class ld28 implements ApplicationListener {
 			e.value.load(assetManager);
 		}
 		
-		assetManager = new AssetManager();
+		currentScene.start(assetManager);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ld28 implements ApplicationListener {
 			Scene nextScene = scenes.get(currentScene.nextSceneName);
 			currentScene.end();
 			currentScene = nextScene;
-			currentScene.start();
+			currentScene.start(assetManager);
 		}
 	}
 

@@ -5,7 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 public class Scene {
 	public boolean nextScene;
 	public String nextSceneName;
-	public void start()
+	public void start(AssetManager assetManager)
 	{
 		
 	}
