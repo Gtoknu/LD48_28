@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.CircleMapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -20,6 +22,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -39,11 +43,12 @@ public class GameScene extends Scene {
 	final static float unitScale = 1f/tileSize;
 	World world;
 	Box2DDebugRenderer physicsRenderer;
+	Body charBody;
 	//final static float unitScale = 5f;
 	@Override
 	public void start(AssetManager assetManager) {
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
-		world = new World(new Vector2(0, 10), true);
+		world = new World(new Vector2(0, -10), true);
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(12 * w/h, 12);
@@ -52,7 +57,7 @@ public class GameScene extends Scene {
 		
 		batch = new SpriteBatch();
 		map = new TmxMapLoader().load("data/first level.tmx");
-		MapLayer layer = map.getLayers().get(1);
+		MapLayer layer = map.getLayers().get(0);
 		MapObjects objs = layer.getObjects();
 		Iterator<MapObject> objIt = objs.iterator();
 		Vector2 tmp = new Vector2();
@@ -69,9 +74,19 @@ public class GameScene extends Scene {
 				ps.setAsBox(rect.getWidth() * unitScale / 2f, rect.getHeight() * unitScale/ 2f, rect.getCenter(tmp).scl(unitScale), 0);
 				Body nb = world.createBody(bd);
 				nb.createFixture(ps, 1);
+				ps.dispose();
 			}
 		}
 		
+		bd.type = BodyType.DynamicBody;
+		Ellipse charFlag = ((EllipseMapObject)map.getLayers().get(1).getObjects().get(0)).getEllipse();
+		bd.position.x = charFlag.x * unitScale;
+		bd.position.y = charFlag.y * unitScale;
+		PolygonShape ps = new PolygonShape();
+		ps.setAsBox(0.5f, 0.5f);
+		charBody = world.createBody(bd);
+		charBody.createFixture(ps, 2);
+		ps.dispose();
 		mapRenderer = new OrthogonalTiledMapRenderer(map, 1/16f, batch);
 		super.start(assetManager);
 	}
@@ -100,6 +115,8 @@ public class GameScene extends Scene {
 		mapRenderer.setView(camera);
 		mapRenderer.render();
 		physicsRenderer.render(world, camera.combined);
+		
+		world.step(1f/45f, 2, 4);
 	}
 	
 
