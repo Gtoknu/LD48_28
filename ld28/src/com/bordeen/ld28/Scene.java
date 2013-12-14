@@ -5,6 +5,8 @@ import com.badlogic.gdx.assets.AssetManager;
 public class Scene {
 	public boolean nextScene;
 	public String nextSceneName;
+	public boolean changeStLoop = false;
+	public int stLoopToPlay = 0;
 	public void start(AssetManager assetManager)
 	{
 		

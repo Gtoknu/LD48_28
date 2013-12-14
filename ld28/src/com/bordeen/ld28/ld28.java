@@ -6,6 +6,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,8 +23,10 @@ public class ld28 implements ApplicationListener {
 	AssetManager assetManager;
 	ObjectMap<String, Scene> scenes = new ObjectMap<String, Scene>();
 	Scene currentScene = null;
+	Music[] stLoops;
+	int playingLoop = 0;
 	@Override
-	public void create() {		
+	public void create() {
 		assetManager = new AssetManager();
 		currentScene = scenes.put("Main Menu", new MainMenu());
 		scenes.put("Game", new GameScene());
@@ -36,6 +39,18 @@ public class ld28 implements ApplicationListener {
 		}
 		
 		assetManager.finishLoading();
+		stLoops = new Music[] {
+			Gdx.audio.newMusic(Gdx.files.internal("data/organ.mp3")),
+			Gdx.audio.newMusic(Gdx.files.internal("data/piano.mp3")),
+			Gdx.audio.newMusic(Gdx.files.internal("data/bos.mp3"))
+		};
+		for(int i = 0; i < stLoops.length; ++i)
+		{
+			stLoops[i].setLooping(true);
+			stLoops[i].setVolume(0.5f);
+		}
+		
+		stLoops[playingLoop].play();
 		
 		currentScene.start(assetManager);
 	}
@@ -49,6 +64,11 @@ public class ld28 implements ApplicationListener {
 			e.value.dispose();
 		}
 		assetManager.dispose();
+		
+		for(int i = 0; i < stLoops.length; ++i)
+		{
+			stLoops[i].dispose();
+		}
 	}
 
 	@Override
@@ -60,6 +80,16 @@ public class ld28 implements ApplicationListener {
 			currentScene.end();
 			currentScene = nextScene;
 			currentScene.start(assetManager);
+		}
+		if(currentScene.changeStLoop)
+		{
+			currentScene.changeStLoop = false;
+			if(currentScene.stLoopToPlay != playingLoop)
+			{
+				stLoops[playingLoop].stop();
+				stLoops[currentScene.stLoopToPlay].play();
+				playingLoop = currentScene.stLoopToPlay;
+			}
 		}
 	}
 

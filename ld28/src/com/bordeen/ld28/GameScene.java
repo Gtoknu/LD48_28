@@ -53,9 +53,12 @@ public class GameScene extends Scene implements InputProcessor {
 	TextureRegion[] backs;
 	float backCounting = 0;
 	int backIndex = 0;
+	TextureRegion[] fends;
+	private Array<Spawner> spawners;
 	@Override
 	public void start(AssetManager assetManager) {
 		this.assetManager = assetManager;
+		spawners = new Array<Spawner>(false, 10);
 		characterSheet = assetManager.get("data/character.png", Texture.class);
 		clock = assetManager.get("data/clock.png", Texture.class);
 		Texture backSheet = assetManager.get("data/background.png", Texture.class);
@@ -63,6 +66,16 @@ public class GameScene extends Scene implements InputProcessor {
 				{
 					new TextureRegion(backSheet, 0, 0, 640, 448),
 					new TextureRegion(backSheet, 0, 448, 640, 448),
+				};
+		Texture fendSheet = assetManager.get("data/fend.png", Texture.class);
+		fends = new TextureRegion[]
+				{
+					new TextureRegion(fendSheet, 0, 0, 32, 32),
+					new TextureRegion(fendSheet, 34, 0, 32, 32),
+					new TextureRegion(fendSheet, 68, 0, 32, 32),
+					new TextureRegion(fendSheet, 0, 34, 32, 32),
+					new TextureRegion(fendSheet, 34, 34, 32, 32),
+					new TextureRegion(fendSheet, 0, 68, 32, 32),
 				};
 		physicsRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 		world = new World(new Vector2(0, -10), true);
@@ -75,7 +88,7 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		batch = new SpriteBatch();
 		map = new TmxMapLoader().load("data/mapa" + currentLevel +".tmx");
-		cameraMax = cameraMin + ((TiledMapTileLayer)map.getLayers().get(2)).getWidth();
+		cameraMax = cameraMin+((TiledMapTileLayer)map.getLayers().get(2)).getWidth() - camera.viewportWidth;
 		MapLayer layer = map.getLayers().get(0);
 		
 		MapObjects objs = layer.getObjects();
@@ -122,6 +135,29 @@ public class GameScene extends Scene implements InputProcessor {
 				Fixture f = b.createFixture(ps, 1);
 				f.setSensor(true);
 			}
+			else if(type.compareTo("spawn") == 0)
+			{
+				Spawner s = new Spawner();
+				((RectangleMapObject)obj).getRectangle().getCenter(s.position);
+				s.position.scl(unitScale);
+				s.maximum = Integer.parseInt(props.get("maximum", String.class));
+				s.onlyClose = Boolean.parseBoolean(props.get("onlyClose", "0", String.class));
+				s.interval = Float.parseFloat(props.get("interval", String.class));
+				String enemy = props.get("enemy", String.class);
+				if(enemy.compareTo("cup") == 0)
+				{
+					s.enemy = Enemy.Cup;
+				}
+				else if(enemy.compareTo("pillow") == 0)
+				{
+					s.enemy = Enemy.Pillow;
+				}
+				else if(enemy.compareTo("sheep") == 0)
+				{
+					s.enemy = Enemy.Sheep;
+				}
+				spawners.add(s);
+			}
 		}
 		ps.dispose();
 		character = new Character();
@@ -140,6 +176,7 @@ public class GameScene extends Scene implements InputProcessor {
 		assetManager.load("data/character.png", Texture.class);
 		assetManager.load("data/clock.png", Texture.class);
 		assetManager.load("data/background.png", Texture.class);
+		assetManager.load("data/fend.png", Texture.class);
 	}
 	@Override
 	public void end() {
@@ -157,6 +194,7 @@ public class GameScene extends Scene implements InputProcessor {
 	}
 	final static float bpm = 80;
 	final static float bps = bpm/60;
+	float time = 0;
 	@Override
 	public void render() {
 		float dt = 1f/45f;
@@ -179,6 +217,15 @@ public class GameScene extends Scene implements InputProcessor {
 		batch.draw(backs[backIndex], 0, 0, 0, 0, backs[backIndex].getRegionWidth() * unitScale, backs[backIndex].getRegionHeight() * unitScale, 1, 1, 0);
 		batch.end();
 		batch.enableBlending();
+		
+		batch.begin();
+		time = (time+dt) % fends.length;
+		for(int i = 0; i < spawners.size; ++i)
+		{
+			Spawner s = spawners.get(i);
+			batch.draw(fends[(int)time], s.position.x - 0.5f, s.position.y - 0.5f, 1, 1);
+		}
+		batch.end();
 		
 		mapRenderer.setView(camera);
 		mapRenderer.render();
