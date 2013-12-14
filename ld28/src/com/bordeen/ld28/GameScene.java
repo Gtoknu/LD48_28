@@ -3,6 +3,7 @@ package com.bordeen.ld28;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
@@ -42,12 +43,13 @@ public class GameScene extends Scene implements InputProcessor {
 	private SpriteBatch batch;
 	TiledMap map = new TiledMap();
 	OrthogonalTiledMapRenderer mapRenderer;
-	final static float tileSize = 32f;
-	final static float unitScale = 1f/tileSize;
+	public final static float tileSize = 32f;
+	public final static float unitScale = 1f/tileSize;
 	World world;
 	Box2DDebugRenderer physicsRenderer;
 	Texture characterSheet;
-	Body charBody;
+	Character character;
+	InputMultiplexer imux;
 	//final static float unitScale = 5f;
 	@Override
 	public void start(AssetManager assetManager) {
@@ -82,20 +84,15 @@ public class GameScene extends Scene implements InputProcessor {
 				ps.dispose();
 			}
 		}
-		
-		bd.type = BodyType.DynamicBody;
-		Ellipse charFlag = ((EllipseMapObject)map.getLayers().get(1).getObjects().get(0)).getEllipse();
-		bd.position.x = charFlag.x * unitScale;
-		bd.position.y = charFlag.y * unitScale;
-		PolygonShape ps = new PolygonShape();
-		ps.setAsBox(0.5f, 0.5f);
-		charBody = world.createBody(bd);
-		charBody.createFixture(ps, 2);
-		ps.dispose();
+		character = new Character();
+		character.create(map, world, characterSheet);
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale, batch);
 		super.start(assetManager);
 		
-		Gdx.input.setInputProcessor(this);
+		imux = new InputMultiplexer();
+		imux.addProcessor(character);
+		imux.addProcessor(this);
+		Gdx.input.setInputProcessor(imux);
 		
 	}
 	@Override
@@ -121,70 +118,26 @@ public class GameScene extends Scene implements InputProcessor {
 		Gdx.gl.glClearColor(0.2f, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
+		character.calcVars();
+		
 		mapRenderer.setView(camera);
 		mapRenderer.render();
+		character.draw(batch);
+		character.update();
 		
-		batch.begin();
-		Vector2 charPos = charBody.getPosition();
-		batch.draw(characterSheet, charPos.x - 0.5f, charPos.y - 0.5f, 1, 1);
-		batch.end();
-		float charDesiredVel = 0;
-		switch(keyState & (KLEFT | KRIGHT))
-		{
-		case KLEFT:
-			charDesiredVel = -5; break;
-		case KRIGHT:
-			charDesiredVel = 5; break;
-		}
-		float velChange = charDesiredVel - charBody.getLinearVelocity().x;
-		float imp = charBody.getMass() * velChange;
-		Vector2 charCenter = charBody.getWorldCenter();
-		charBody.applyLinearImpulse(imp, 0, charCenter.x, charCenter.y, true);
-		
-		physicsRenderer.render(world, camera.combined);
+		//physicsRenderer.render(world, camera.combined);
 		
 		world.step(1f/45f, 2, 4);
 	}
 	
-	final static int KLEFT = 0x1;
-	final static int KRIGHT = 0x2;
-	final static int KUP = 0x4;
-	final static int KDOWN = 0x8;
 	int keyState = 0;
+	boolean charFlipX = false;
 	@Override
 	public boolean keyDown(int keycode) {
-		switch(keycode)
-		{
-		case Keys.LEFT:
-			keyState |= KLEFT; break;
-
-		case Keys.RIGHT:
-			keyState |= KRIGHT; break;
-
-		case Keys.UP:
-			keyState |= KUP; break;
-
-		case Keys.DOWN:
-			keyState |= KDOWN; break;
-		}
 		return false;
 	}
 	@Override
 	public boolean keyUp(int keycode) {
-		switch(keycode)
-		{
-		case Keys.LEFT:
-			keyState &= ~KLEFT; break;
-
-		case Keys.RIGHT:
-			keyState &= ~KRIGHT; break;
-
-		case Keys.UP:
-			keyState &= ~KUP; break;
-
-		case Keys.DOWN:
-			keyState &= ~KDOWN; break;
-		}
 		return false;
 	}
 	@Override

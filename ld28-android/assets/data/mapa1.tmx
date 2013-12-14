@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="100" height="24" tilewidth="32" tileheight="32">
+<map version="1.0" orientation="orthogonal" width="100" height="14" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="pickleTile" tilewidth="32" tileheight="32">
   <image source="pickleTile.png" width="512" height="32"/>
  </tileset>
- <objectgroup name="collision" width="100" height="24">
-  <object x="0" y="480" width="544" height="288"/>
+ <objectgroup name="collision" width="100" height="14">
+  <object x="0" y="352" width="544" height="96"/>
  </objectgroup>
- <objectgroup name="Player start" width="100" height="24">
-  <object x="49" y="395">
+ <objectgroup name="Player start" width="100" height="14">
+  <object x="51" y="300">
    <ellipse/>
   </object>
  </objectgroup>
- <layer name="Camada de Tiles 1" width="100" height="24">
+ <layer name="Camada de Tiles 1" width="100" height="14">
   <data encoding="base64" compression="zlib">
-   eJzt0TENADAMwLAy2PijHYj1yGFLQZAZAAAAAADg11mIPXch9vjR4keLHy1+tPjR4keLHy0Pv8gJgA==
+   eJzt0TENAAAIBDEcgH+1rAj4gaFNTsFVAQAAAHB1IHImEDl+/LJY1wMg
   </data>
  </layer>
 </map>
