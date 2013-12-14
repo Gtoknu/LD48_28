@@ -198,6 +198,8 @@ public class GameScene extends Scene implements InputProcessor {
 		
 		world.dispose();
 		physicsRenderer.dispose();
+		enemies.clear();
+		spawners.clear();
 	}
 	@Override
 	public void dispose() {
@@ -288,7 +290,7 @@ public class GameScene extends Scene implements InputProcessor {
 			return;
 		}
 		
-		//physicsRenderer.render(world, camera.combined);
+		physicsRenderer.render(world, camera.combined);
 		
 		world.step(dt, 2, 4);
 	}
