@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL10;
@@ -33,6 +34,10 @@ public class ld28 implements ApplicationListener {
 		scenes.put("Credits", new Credits());
 		scenes.put("Instructions", new Instructions());
 		currentScene = scenes.get("Main Menu");
+		GameScene gs = (GameScene)scenes.get("Game");
+
+		Preferences pref = Gdx.app.getPreferences("YOGONAP");
+		gs.currentLevel = pref.getInteger("HigherLevel", 1);
 		Iterator<Entry<String, Scene>> entries = scenes.entries().iterator();
 		while(entries.hasNext())
 		{

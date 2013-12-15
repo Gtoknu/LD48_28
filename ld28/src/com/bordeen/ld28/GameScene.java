@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
@@ -51,7 +52,8 @@ public class GameScene extends Scene implements InputProcessor {
 	Texture clock;
 	float cameraMin;
 	float cameraMax;
-	int currentLevel = 8;
+	int currentLevel;
+	int maxLevel = 11;
 	AssetManager assetManager;
 	TextureRegion[] backs;
 	float backCounting;
@@ -70,6 +72,10 @@ public class GameScene extends Scene implements InputProcessor {
 	}
 	@Override
 	public void start(AssetManager assetManager) {
+		Preferences pref = Gdx.app.getPreferences("YOGONAP");
+		pref.putInteger("HigherLevel", currentLevel);
+		pref.flush();
+		currentLevel = 10;
 		clocks = new Array<Body>(false, 5);
 		backCounting = 0;
 		backIndex = 0;
@@ -381,6 +387,13 @@ public class GameScene extends Scene implements InputProcessor {
 		if(clocks.size <= 0)
 		{
 			currentLevel++;
+			if(currentLevel >= maxLevel)
+			{
+				currentLevel = 0;
+				nextScene = true;
+				nextSceneName = "Main Menu";
+				return;
+			}
 			end();
 			start(assetManager);
 			return;
