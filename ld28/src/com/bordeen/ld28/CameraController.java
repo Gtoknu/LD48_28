@@ -20,12 +20,14 @@ public class CameraController {
 	float nx1;
 	float ny0;
 	float ny1;
+	float mW;
 	public CameraController(float w, float h, float mapWidth)
 	{
+		mW = mapWidth;
 		camera = new OrthographicCamera(11 * w/h, 11);
 		camera.position.set(cameraMin = camera.viewportWidth/2f, fixedY = 6f, 0);
 		camera.update();
-		cameraMax = cameraMin + mapWidth - camera.viewportWidth;
+		cameraMax = cameraMin + mW - camera.viewportWidth;
 	}
 	
 	public Matrix4 combined()
@@ -102,5 +104,13 @@ public class CameraController {
 			shakeYPoints.add(MathUtils.random(-shakeStrength, shakeStrength));
 		}
 		shaking = true;
+	}
+
+	public void resize(float width, float height) {
+
+		camera = new OrthographicCamera(11 * width/height, 11);
+		camera.position.set(cameraMin = camera.viewportWidth/2f, fixedY = 6f, 0);
+		camera.update();
+		cameraMax = cameraMin + mW - camera.viewportWidth;
 	}
 }

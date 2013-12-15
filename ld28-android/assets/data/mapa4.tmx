@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="30" height="12" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="pickleTile" tilewidth="32" tileheight="32">
+  <image source="pickleTile.png" width="512" height="32"/>
+ </tileset>
+ <objectgroup name="collision" width="30" height="12">
+  <object x="0" y="0" width="32" height="288"/>
+  <object x="32" y="0" width="1216" height="32"/>
+  <object x="0" y="288" width="32" height="96"/>
+  <object x="928" y="0" width="32" height="384"/>
+  <object x="32" y="320" width="288" height="64"/>
+  <object x="352" y="256" width="160" height="128"/>
+  <object x="608" y="352" width="320" height="32"/>
+  <object x="608" y="32" width="32" height="256"/>
+  <object x="640" y="32" width="32" height="224"/>
+  <object x="672" y="32" width="32" height="192"/>
+  <object x="704" y="32" width="224" height="160"/>
+  <object x="768" y="192" width="160" height="32"/>
+ </objectgroup>
+ <objectgroup name="Player start" width="30" height="12">
+  <object x="48" y="272">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <layer name="Camada de Tiles 1" width="30" height="12">
+  <data encoding="base64" compression="zlib">
+   eJwTYGBg4KESFiAB8zFQD3CM2jti7CWU1mhhLxeSGAsD9nRPbXu5CKqCqCPFXnYg5kfCvGjyTESaQ6q96OmG3LCCmcNPAPOiqaeWvcSmeUL2oscDLgzSCwDV2wjV
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="30" height="12">
+  <object name="Clock1" x="288" y="304">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Spawn1" x="736" y="208">
+   <properties>
+    <property name="enemy" value="sheep"/>
+    <property name="interval" value="3"/>
+    <property name="maximum" value="2"/>
+    <property name="onlyClose" value="false"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Spawn2" x="192" y="240">
+   <properties>
+    <property name="enemy" value="cup"/>
+    <property name="interval" value="3"/>
+    <property name="maximum" value="4"/>
+    <property name="onlyClose" value="false"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Clock2" x="912" y="336">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock1" x="432" y="240">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Spawn2" x="432" y="176">
+   <properties>
+    <property name="enemy" value="pillow"/>
+    <property name="interval" value="5"/>
+    <property name="maximum" value="2"/>
+    <property name="onlyClose" value="false"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Clock1" x="560" y="240">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock2" x="688" y="336">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="enemyCol" width="30" height="12">
+  <object x="317" y="160" width="3" height="160"/>
+  <object x="352" y="160" width="3" height="96"/>
+  <object x="509" y="160" width="3" height="96"/>
+  <object x="608" y="288" width="3" height="64"/>
+ </objectgroup>
+</map>

@@ -19,7 +19,7 @@ public class Enemy {
 	public boolean flipDir = false;
 	public int[] sensorTouching = new int[3];
 	Vector2 lnVel;
-	Vector2 worldCenter;
+	Vector2 worldCenter = new Vector2();
 	GameScene gs;
 	private boolean dead;
 	void die()

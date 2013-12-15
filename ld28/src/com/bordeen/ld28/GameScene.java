@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
@@ -50,7 +51,7 @@ public class GameScene extends Scene implements InputProcessor {
 	Texture clock;
 	float cameraMin;
 	float cameraMax;
-	int currentLevel = 3;
+	int currentLevel = 1;
 	AssetManager assetManager;
 	TextureRegion[] backs;
 	float backCounting;
@@ -64,6 +65,10 @@ public class GameScene extends Scene implements InputProcessor {
 	Sound sclock;
 	int mapWidth;
 	@Override
+	public void resize(int width, int height) {
+		camera.resize(width, height);
+	}
+	@Override
 	public void start(AssetManager assetManager) {
 		clocks = new Array<Body>(false, 5);
 		backCounting = 0;
@@ -71,7 +76,7 @@ public class GameScene extends Scene implements InputProcessor {
 		map = new TiledMap();
 		this.assetManager = assetManager;
 		spawners = new Array<Spawner>(false, 10);
-		characterSheet = assetManager.get("data/character.png", Texture.class);
+		characterSheet = assetManager.get("data/charactersheet.png", Texture.class);
 		clock = assetManager.get("data/clock.png", Texture.class);
 		Texture backSheet = assetManager.get("data/background.png", Texture.class);
 		backs = new TextureRegion[]
@@ -238,7 +243,7 @@ public class GameScene extends Scene implements InputProcessor {
 	}
 	@Override
 	public void load(AssetManager assetManager) {
-		assetManager.load("data/character.png", Texture.class);
+		assetManager.load("data/charactersheet.png", Texture.class);
 		assetManager.load("data/clock.png", Texture.class);
 		assetManager.load("data/background.png", Texture.class);
 		assetManager.load("data/fend.png", Texture.class);
@@ -384,6 +389,11 @@ public class GameScene extends Scene implements InputProcessor {
 	}
 	@Override
 	public boolean keyDown(int keycode) {
+		if(keycode == Keys.R)
+		{
+			character.die();
+			character.body.applyLinearImpulse(0, 5, character.worldCenter.x, character.worldCenter.y, true);
+		}
 		return false;
 	}
 	@Override

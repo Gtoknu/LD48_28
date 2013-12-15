@@ -10,42 +10,31 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class MainMenu extends Scene implements InputProcessor {
-	TextureRegion[] logo;
+public class Instructions extends Scene implements InputProcessor {
+	TextureRegion toShow;
 	OrthographicCamera uiCam;
 	SpriteBatch batch;
 	@Override
 	public void start(AssetManager assetManager) {
-		Texture sheet = assetManager.get("data/logonap.png", Texture.class);
-		logo = new TextureRegion[]
-				{
-					new TextureRegion(sheet, 0, 259, 525, 70),
-					new TextureRegion(sheet, 0, 331, 250, 130),
-					new TextureRegion(sheet, 0, 0, 786, 257)
-				};
+		Texture sheet = assetManager.get("data/inscreds.png", Texture.class);
+		toShow = new TextureRegion(sheet, 0, 0, 783, 333);
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		uiCam = new OrthographicCamera(800, 800 * h/w);
 		uiCam.position.set(uiCam.viewportWidth/2f, uiCam.viewportHeight/2f, 0);
 		uiCam.update();
-		batch = new SpriteBatch(3);
+		batch = new SpriteBatch(2);
 		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override
 	public void load(AssetManager assetManager) {
-		assetManager.load("data/logonap.png", Texture.class);
+		assetManager.load("data/inscreds.png", Texture.class);
 	}
 
 	@Override
 	public void end() {
 		batch.dispose();
-	}
-
-	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		super.dispose();
 	}
 	@Override
 	public void resize(int width, int height) {
@@ -55,49 +44,27 @@ public class MainMenu extends Scene implements InputProcessor {
 		uiCam.position.set(uiCam.viewportWidth/2f, uiCam.viewportHeight/2f, 0);
 		uiCam.update();
 	}
-	float time = 0;
-	float mul = 1;
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
+		super.dispose();
+	}
 	@Override
 	public void render() {
-		float dt = Math.min(1f/60f, Gdx.graphics.getDeltaTime());
-		time += dt * mul;
-		if(time > GameScene.spb || time < -GameScene.spb)
-		{
-			mul *= -1;
-		}
 		Gdx.gl.glClearColor(0.898f, 0.901f, 0.780f, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(uiCam.combined);
 		batch.begin();
-		batch.draw(logo[0], uiCam.viewportWidth * 0.5f - 525f * 0.5f, uiCam.viewportHeight * 0.90f - 70, 525, 70);
-		batch.draw(logo[1], uiCam.viewportWidth * 0.5f - 250f * 0.5f, uiCam.viewportHeight * 0.70f - 130, 250 * 0.5f, 130 * 0.5f, 250, 130, 1 + Math.abs(time) * 0.1f, 1 + Math.abs(time) * 0.1f, time * 20);
-		batch.draw(logo[2], uiCam.viewportWidth * 0.5f - 628.8f * 0.5f, 40, 628.8f, 205.6f);
+		batch.draw(toShow, uiCam.viewportWidth * 0.5f - 783 * 0.5f, uiCam.viewportHeight - 20 - 333);
 		batch.end();
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
-		switch(keycode)
-		{
-		case Keys.SPACE:
-			nextScene = true;
-			nextSceneName = "Game";
-			break;
-		case Keys.C:
-			nextScene = true;
-			nextSceneName = "Credits";
-			break;
-		case Keys.V:
-			nextScene = true;
-			nextSceneName = "Instructions";
-			break;
-		case Keys.Q:
-			Gdx.app.exit();
-			break;
-		default:
-			return false;
-		}
+		nextScene = true;
+		nextSceneName = "Main Menu";
 		return true;
 	}
 

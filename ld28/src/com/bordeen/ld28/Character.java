@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Ellipse;
@@ -19,12 +20,16 @@ import com.badlogic.gdx.utils.Array;
 
 public class Character implements InputProcessor {
 	Body body;
-	Texture sheet;
+	TextureRegion[] sheet;
 	GameScene gs;
 	void create(GameScene gs, TiledMap map, World world, Texture sheet)
 	{
 		this.gs = gs;
-		this.sheet = sheet;
+		this.sheet = new TextureRegion[]
+				{
+				new TextureRegion(sheet, 0, 0, 32, 32),
+				new TextureRegion(sheet, 32, 0, 32, 32)
+				};
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DynamicBody;
 		bd.fixedRotation = true;
@@ -71,11 +76,15 @@ public class Character implements InputProcessor {
 		lnVel = body.getLinearVelocity();
 		worldCenter = body.getWorldCenter();
 	}
-	
+	int currentFrame = 0;
+	float frameTimer = 0;
 	void draw(SpriteBatch batch)
 	{
-		batch.draw(sheet, pos.x - 0.5f, pos.y - 0.5f, 1, 1, 0, 0, 32, 32, flipX, died);
+		sheet[currentFrame].flip(flipX, died);
+		batch.draw(sheet[currentFrame], pos.x - 0.5f, pos.y - 0.5f, 1, 1);
+		sheet[currentFrame].flip(flipX, died);
 	}
+	
 	int keyState = 0;
 	final static int KLEFT = 0x1;
 	final static int KRIGHT = 0x2;
@@ -111,6 +120,25 @@ public class Character implements InputProcessor {
 			if((keyState & KUP) == KUP)
 			{
 				body.applyLinearImpulse(0, 0.125f * body.getMass() * jumpTimeout, worldCenter.x, worldCenter.y, true);
+			}
+		}
+		if(footTouching < 1)
+		{
+			currentFrame = 1;
+			frameTimer = 0;
+		}
+		else if(charDesiredVel == 0)
+		{
+			currentFrame = 0;
+			frameTimer = 0;
+		}
+		else
+		{
+			frameTimer += dt;
+			if(frameTimer >= GameScene.spb * 0.25f)
+			{
+				frameTimer -= GameScene.spb * 0.25f;
+				currentFrame = (currentFrame + 1) % 2;
 			}
 		}
 	}

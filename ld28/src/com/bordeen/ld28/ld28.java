@@ -28,9 +28,11 @@ public class ld28 implements ApplicationListener {
 	@Override
 	public void create() {
 		assetManager = new AssetManager();
-		currentScene = scenes.put("Main Menu", new MainMenu());
+		scenes.put("Main Menu", new MainMenu());
 		scenes.put("Game", new GameScene());
-		currentScene = scenes.get("Game");
+		scenes.put("Credits", new Credits());
+		scenes.put("Instructions", new Instructions());
+		currentScene = scenes.get("Main Menu");
 		Iterator<Entry<String, Scene>> entries = scenes.entries().iterator();
 		while(entries.hasNext())
 		{
@@ -78,6 +80,7 @@ public class ld28 implements ApplicationListener {
 		{
 			Scene nextScene = scenes.get(currentScene.nextSceneName);
 			currentScene.end();
+			currentScene.nextScene = false;
 			currentScene = nextScene;
 			currentScene.start(assetManager);
 		}
@@ -95,6 +98,7 @@ public class ld28 implements ApplicationListener {
 
 	@Override
 	public void resize(int width, int height) {
+		currentScene.resize(width, height);
 	}
 
 	@Override

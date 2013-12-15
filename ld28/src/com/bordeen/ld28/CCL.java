@@ -56,10 +56,12 @@ public class CCL implements ContactListener {
 								impulse.nor();
 								float sx = impulse.x, sy = impulse.y;
 								impulse.add(Math.signum(sx), 0);
-								impulse.nor().scl(-5).scl(bodyB.getMass());
+								impulse.nor().scl(-5.25f).scl(bodyB.getMass());
+								bodyB.setLinearVelocity(0, 0);
 								bodyB.applyLinearImpulse(impulse, e.worldCenter, true);
 								impulse.set(-sx, sy).add(0,  Math.signum(sy));
-								impulse.nor().scl(5).scl(bodyA.getMass());
+								impulse.nor().scl(5.25f).scl(bodyA.getMass());
+								bodyA.setLinearVelocity(0, 0);
 								bodyA.applyLinearImpulse(impulse, character.worldCenter, true);
 							}
 						}
@@ -111,9 +113,15 @@ public class CCL implements ContactListener {
 								e.die();
 								Vector2 impulse = new Vector2(character.worldCenter);
 								impulse.sub(e.worldCenter);
-								impulse.nor().add(0, 0.5f).scl(-6);
+								impulse.nor();
+								float sx = impulse.x, sy = impulse.y;
+								impulse.add(Math.signum(sx), 0);
+								impulse.nor().scl(-5.25f).scl(bodyA.getMass());
+								bodyA.setLinearVelocity(0, 0);
 								bodyA.applyLinearImpulse(impulse, e.worldCenter, true);
-								impulse.scl(-1);
+								impulse.set(-sx, sy).add(0,  Math.signum(sy));
+								impulse.nor().scl(5.25f).scl(bodyB.getMass());
+								bodyB.setLinearVelocity(0, 0);
 								bodyB.applyLinearImpulse(impulse, character.worldCenter, true);
 								
 							}

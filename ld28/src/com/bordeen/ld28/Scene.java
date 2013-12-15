@@ -23,8 +23,8 @@ public class Scene {
 	{
 		
 	}
-	public void render() {
-		// TODO Auto-generated method stub
-		
+	public void render() {		
+	}
+	public void resize(int width, int height) {
 	}
 }
