@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.utils.Array;
 
 public class Enemy {
 	Body body;
@@ -81,8 +82,28 @@ public class Enemy {
 		sp.dispose();
 		flipDir = MathUtils.randomBoolean();
 	}
-	public void update()
+	boolean alreadyDied = false;
+	float diedTime = 0;
+	public final static float dieInterval = 1.0f;
+	public void update(float dt)
 	{
+		if(died)
+		{
+			if(!alreadyDied)
+			{
+				Array<Fixture> fixList = body.getFixtureList();
+				for(int i = 0; i < fixList.size; ++i)
+				{
+					Fixture f = fixList.get(i);
+					Filter fd = f.getFilterData();
+					fd.maskBits = Filters.scenary;
+					f.setFilterData(fd);
+				}
+				alreadyDied = true;
+			}
+			diedTime += dt;
+			return;
+		}
 		float charDesiredVel = 0;
 		switch(type)
 		{
@@ -93,7 +114,7 @@ public class Enemy {
 				flipDir = true;
 			if(sensorTouching[0] > 0)
 			{
-				body.applyLinearImpulse(0, 1f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				body.applyLinearImpulse(0, 3f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
 			else
 			{
@@ -105,7 +126,7 @@ public class Enemy {
 			charDesiredVel = flipDir ? -2 : 2;
 			if(Math.abs(gs.character.worldCenter.x - worldCenter.x)  < 5 && (gs.character.worldCenter.y - worldCenter.y) > 1 && sensorTouching[0] > 0)
 			{
-				body.applyLinearImpulse(0, 1f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				body.applyLinearImpulse(0, 1.8f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
 			break;
 		case Pillow:

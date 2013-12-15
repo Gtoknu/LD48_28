@@ -14,6 +14,15 @@ public class Spawner {
 	public float anim = 0;
 	public Array<Enemy> spawned;
 	public void update(float dt) {
+		for(int i = spawned.size-1; i >= 0; --i)
+		{
+			Enemy e =spawned.get(i); 
+			if(e.diedTime > Enemy.dieInterval)
+			{
+				spawned.removeIndex(i);
+				gs.world.destroyBody(e.body);
+			}
+		}
 		if(spawned.size < maximum)
 		{
 			time += dt;

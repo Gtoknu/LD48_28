@@ -118,7 +118,7 @@ public class GameScene extends Scene implements InputProcessor {
 				ps.setAsBox(rect.getWidth() * unitScale / 2f, rect.getHeight() * unitScale/ 2f, rect.getCenter(tmp).scl(unitScale), 0);
 				Body nb = world.createBody(bd);
 				Fixture f = nb.createFixture(ps, 1);
-				f.setRestitution(0.3f);
+				f.setRestitution(0.0f);
 				f.setFriction(0f);
 				Filter fd = f.getFilterData();
 				fd.categoryBits = Filters.scenary;
@@ -306,7 +306,15 @@ public class GameScene extends Scene implements InputProcessor {
 
 		for(int i = 0; i < enemies.size; ++i)
 		{
-			enemies.get(i).update();
+			enemies.get(i).update(dt);
+		}
+		
+		for(int i = enemies.size-1; i >= 0; --i)
+		{
+			if(enemies.get(i).diedTime > Enemy.dieInterval)
+			{
+				enemies.removeIndex(i);
+			}
 		}
 		
 		camera.position.x = Math.max(cameraMin, Math.min(cameraMax, character.pos.x));
@@ -333,7 +341,7 @@ public class GameScene extends Scene implements InputProcessor {
 			return;
 		}
 		
-		physicsRenderer.render(world, camera.combined);
+		//physicsRenderer.render(world, camera.combined);
 		
 		world.step(dt, 2, 4);
 	}
