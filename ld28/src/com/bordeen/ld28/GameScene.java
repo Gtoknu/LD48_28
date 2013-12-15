@@ -26,6 +26,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -119,6 +120,9 @@ public class GameScene extends Scene implements InputProcessor {
 				Fixture f = nb.createFixture(ps, 1);
 				f.setRestitution(0.3f);
 				f.setFriction(0f);
+				Filter fd = f.getFilterData();
+				fd.categoryBits = Filters.scenary;
+				f.setFilterData(fd);
 				ps.dispose();
 			}
 		}
@@ -144,6 +148,10 @@ public class GameScene extends Scene implements InputProcessor {
 				clocks.add(b);
 				Fixture f = b.createFixture(ps, 1);
 				f.setSensor(true);
+				Filter fd = f.getFilterData();
+				fd.categoryBits = Filters.clock;
+				fd.maskBits = Filters.character;
+				f.setFilterData(fd);
 			}
 			else if(type.compareTo("spawn") == 0)
 			{
@@ -178,13 +186,18 @@ public class GameScene extends Scene implements InputProcessor {
 		Fixture f = bound.createFixture(ps, 1);
 		f.setFriction(0);
 		f.setRestitution(0.1f);
+		Filter fd = f.getFilterData();
+		fd.categoryBits = Filters.scenary;
+		f.setFilterData(fd);
 		bd.position.set(mapWidth+0.5f, 10);
 		bound = world.createBody(bd);
 		ps.setAsBox(0.5f, 20);
 		f = bound.createFixture(ps, 1);
 		f.setFriction(0);
 		f.setRestitution(0.1f);
-		
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.scenary;
+		f.setFilterData(fd);
 		ps.dispose();
 		character = new Character();
 		character.create(map, world, characterSheet);

@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -40,14 +41,24 @@ public class Character implements InputProcessor {
 		ps.setAsBox(0.315f, 0.49f * 0.80f, new Vector2(0, 0.49f * 0.2f), 0);
 		Fixture f = body.createFixture(ps, 2);
 		f.setUserData(new Integer(0));
+		Filter fd = f.getFilterData();
+		fd.categoryBits = Filters.character;
+		f.setFilterData(fd);
 		
 		ps.setAsBox(0.31f, 0.49f * 0.20f, new Vector2(0, -0.49f * 0.8f), 0);
 		f = body.createFixture(ps, 2);
 		f.setUserData(new Integer(1));
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.character;
+		f.setFilterData(fd);
 		
 		ps.setAsBox(0.2f, 0.1f, new Vector2(0f, -0.49f), 0);
 		f = body.createFixture(ps, 1);
 		f.setSensor(true);
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.character;
+		fd.maskBits &= ~Filters.clock & ~Filters.enemy & ~Filters.character;
+		f.setFilterData(fd);
 		ps.dispose();
 	}
 	int footTouching = 0;

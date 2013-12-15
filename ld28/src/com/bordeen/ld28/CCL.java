@@ -1,6 +1,7 @@
 package com.bordeen.ld28;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -38,7 +39,20 @@ public class CCL implements ContactListener {
 							if(index == 0)
 								character.died = true;
 							else if (index == 1)
-								((Enemy)bodyB.getUserData()).died = true;
+							{
+								Enemy e =(Enemy)bodyB.getUserData(); 
+								e.died = true;
+								Vector2 impulse = new Vector2(character.worldCenter);
+								impulse.sub(e.worldCenter);
+								impulse.nor();
+								float sx = impulse.x, sy = impulse.y;
+								impulse.add(Math.signum(sx), 0);
+								impulse.nor().scl(-5).scl(bodyB.getMass());
+								bodyB.applyLinearImpulse(impulse, e.worldCenter, true);
+								impulse.set(-sx, sy).add(0,  Math.signum(sy));
+								impulse.nor().scl(5).scl(bodyA.getMass());
+								bodyA.applyLinearImpulse(impulse, character.worldCenter, true);
+							}
 						}
 					}
 				}
@@ -77,7 +91,17 @@ public class CCL implements ContactListener {
 							if(index == 0)
 								character.died = true;
 							else if (index == 1)
-								((Enemy)bodyA.getUserData()).died = true;
+							{
+								Enemy e =(Enemy)bodyA.getUserData(); 
+								e.died = true;
+								Vector2 impulse = new Vector2(character.worldCenter);
+								impulse.sub(e.worldCenter);
+								impulse.nor().add(0, 0.5f).scl(-6);
+								bodyA.applyLinearImpulse(impulse, e.worldCenter, true);
+								impulse.scl(-1);
+								bodyB.applyLinearImpulse(impulse, character.worldCenter, true);
+								
+							}
 						}
 					}
 				}

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -44,19 +45,40 @@ public class Enemy {
 		float hy = tr.getRegionHeight() * 0.5f * GameScene.unitScale - 0.01f;
 		float hx = tr.getRegionWidth() * 0.5f * GameScene.unitScale - 0.01f;
 		sp.setAsBox(hx, hy);
-		body.createFixture(sp, 1);
-		sp.setAsBox(0.15f, 0.1f, new Vector2(0f, -hy), 0);
 		Fixture f = body.createFixture(sp, 1);
+		Filter fd = f.getFilterData();
+		fd.categoryBits = Filters.enemy;
+		fd.maskBits &= ~Filters.clock;
+		f.setFilterData(fd);
+		
+		sp.setAsBox(0.15f, 0.1f, new Vector2(0f, -hy), 0);
+		f = body.createFixture(sp, 1);
 		f.setSensor(true);
 		f.setUserData(new Integer(0));
+		f = body.createFixture(sp, 1);
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.enemy;
+		fd.maskBits &= ~Filters.clock;
+		f.setFilterData(fd);
+		
 		sp.setAsBox(0.1f, 0.15f, new Vector2(-hx, 0), 0);
 		f = body.createFixture(sp, 1);
 		f.setSensor(true);
 		f.setUserData(new Integer(1));
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.enemy;
+		fd.maskBits &= ~Filters.clock;
+		f.setFilterData(fd);
 		sp.setAsBox(0.1f, 0.15f, new Vector2(hx, 0), 0);
 		f = body.createFixture(sp, 1);
 		f.setSensor(true);
 		f.setUserData(new Integer(2));
+		fd = f.getFilterData();
+		fd.categoryBits = Filters.enemy;
+		fd.maskBits &= ~Filters.clock;
+		f.setFilterData(fd);
+		
+		sp.dispose();
 		flipDir = MathUtils.randomBoolean();
 	}
 	public void update()
