@@ -15,17 +15,15 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class Character implements InputProcessor {
 	Body body;
 	Texture sheet;
-	/**
-	 * @param map
-	 * @param world
-	 * @param sheet
-	 */
-	void create(TiledMap map, World world, Texture sheet)
+	GameScene gs;
+	void create(GameScene gs, TiledMap map, World world, Texture sheet)
 	{
+		this.gs = gs;
 		this.sheet = sheet;
 		BodyDef bd = new BodyDef();
 		bd.type = BodyType.DynamicBody;
@@ -38,19 +36,21 @@ public class Character implements InputProcessor {
 		body.setUserData(this);
 		
 		PolygonShape ps = new PolygonShape();
-		ps.setAsBox(0.315f, 0.49f * 0.80f, new Vector2(0, 0.49f * 0.2f), 0);
+		ps.setAsBox(0.315f, 0.48f * 0.80f, new Vector2(0, 0.48f * 0.2f), 0);
 		Fixture f = body.createFixture(ps, 2);
 		f.setUserData(new Integer(0));
 		Filter fd = f.getFilterData();
 		fd.categoryBits = Filters.character;
 		f.setFilterData(fd);
+		f.setFriction(0);
 		
-		ps.setAsBox(0.31f, 0.49f * 0.20f, new Vector2(0, -0.49f * 0.8f), 0);
+		ps.setAsBox(0.3149f, 0.48f * 0.20f, new Vector2(0, -0.48f * 0.8f), 0);
 		f = body.createFixture(ps, 2);
 		f.setUserData(new Integer(1));
 		fd = f.getFilterData();
 		fd.categoryBits = Filters.character;
 		f.setFilterData(fd);
+		f.setFriction(0);
 		
 		ps.setAsBox(0.2f, 0.1f, new Vector2(0f, -0.49f), 0);
 		f = body.createFixture(ps, 1);
@@ -74,15 +74,26 @@ public class Character implements InputProcessor {
 	
 	void draw(SpriteBatch batch)
 	{
-		batch.draw(sheet, pos.x - 0.5f, pos.y - 0.5f, 1, 1, 0, 0, 32, 32, flipX, false);
+		batch.draw(sheet, pos.x - 0.5f, pos.y - 0.5f, 1, 1, 0, 0, 32, 32, flipX, died);
 	}
 	int keyState = 0;
 	final static int KLEFT = 0x1;
 	final static int KRIGHT = 0x2;
 	final static int KUP = 0x4;
 	final static int KDOWN = 0x8;
+	float diedTime = 0;
+	public final static float dieInterval = 2.0f;
 	void update(float dt)
 	{
+		if(worldCenter.y < -1)
+		{
+			die();
+		}
+		if(died)
+		{
+			diedTime += dt;
+			return;
+		}
 		float charDesiredVel = 0;
 		switch(keyState & (KLEFT | KRIGHT))
 		{
@@ -108,6 +119,7 @@ public class Character implements InputProcessor {
 	public boolean died = false;
 	@Override
 	public boolean keyDown(int keycode) {
+		if(died) return false;
 		switch(keycode)
 		{
 		case Keys.LEFT:
@@ -121,6 +133,7 @@ public class Character implements InputProcessor {
 			{
 				body.applyLinearImpulse(0, 3.5f * body.getMass(), worldCenter.x, worldCenter.y, true);
 				jumpTimeout = 1.0f;
+				gs.jump.play();
 			}
 			keyState |= KUP;
 			break;
@@ -134,6 +147,7 @@ public class Character implements InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
+		if(died) return false;
 		switch(keycode)
 		{
 		case Keys.LEFT:
@@ -187,5 +201,23 @@ public class Character implements InputProcessor {
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void die() {
+		if(died) return;
+		died = true;
+		gs.die.play();
+		gs.camera.shake(0.5f, 0.4f, 60);
+		diedTime = 0;
+		Array<Fixture> fixList = body.getFixtureList();
+		for(int i = 0; i < fixList.size; ++i)
+		{
+			Fixture f = fixList.get(i);
+			Filter fd = f.getFilterData();
+			fd.maskBits = Filters.scenary;
+			f.setFilterData(fd);
+			f.setFriction(0.3f);
+			f.setRestitution(0.5f);
+		}
 	}
 }

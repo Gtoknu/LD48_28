@@ -1,3 +1,4 @@
 .metadata/
 *.class
 ld28-desktop/bin/
+*.log

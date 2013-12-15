@@ -14,19 +14,42 @@ import com.badlogic.gdx.utils.Array;
 
 public class Enemy {
 	Body body;
-	TextureRegion tr;
+	TextureRegion[] animSheet;
 	Enemies type;
 	public boolean flipDir = false;
 	public int[] sensorTouching = new int[3];
 	Vector2 lnVel;
 	Vector2 worldCenter;
 	GameScene gs;
-	public boolean died;
+	private boolean dead;
+	void die()
+	{
+		if(dead) return;
+		gs.camera.shake(0.3f, 0.2f, 60);
+		gs.kill.play();
+		dead = true;
+		Array<Fixture> fixList = body.getFixtureList();
+		for(int i = 0; i < fixList.size; ++i)
+		{
+			Fixture f = fixList.get(i);
+			Filter fd = f.getFilterData();
+			fd.maskBits = Filters.scenary;
+			f.setFilterData(fd);
+			f.setFriction(0.3f);
+			f.setRestitution(0.5f);
+		}
+	}
+	boolean isDead()
+	{
+		return dead;
+	}
+	float sprW, sprH;
 	public void calcVars()
 	{
 		lnVel = body.getLinearVelocity();
 		worldCenter = body.getWorldCenter();
 	}
+	int currentFrame = 0;
 	public Enemy(GameScene gs, Spawner spawner)
 	{
 		this.gs = gs;
@@ -42,15 +65,18 @@ public class Enemy {
 		body.setUserData(this);
 		PolygonShape sp = new PolygonShape();
 		type = spawner.enemy;
-		tr = gs.enemyTR[type.ordinal()];
-		float hy = tr.getRegionHeight() * 0.5f * GameScene.unitScale - 0.01f;
-		float hx = tr.getRegionWidth() * 0.5f * GameScene.unitScale - 0.01f;
+		animSheet = gs.enemyTR[type.ordinal()];
+		sprH = animSheet[0].getRegionHeight();
+		sprW = animSheet[0].getRegionWidth();
+		float hy = sprH * 0.5f * GameScene.unitScale - 0.01f;
+		float hx = sprW * 0.5f * GameScene.unitScale - 0.01f;
 		sp.setAsBox(hx, hy);
 		Fixture f = body.createFixture(sp, 1);
 		Filter fd = f.getFilterData();
 		fd.categoryBits = Filters.enemy;
 		fd.maskBits &= ~Filters.clock;
 		f.setFilterData(fd);
+		f.setFriction(0);
 		
 		sp.setAsBox(0.15f, 0.1f, new Vector2(0f, -hy), 0);
 		f = body.createFixture(sp, 1);
@@ -82,25 +108,18 @@ public class Enemy {
 		sp.dispose();
 		flipDir = MathUtils.randomBoolean();
 	}
-	boolean alreadyDied = false;
 	float diedTime = 0;
-	public final static float dieInterval = 1.0f;
+	public final static float dieInterval = 1.5f;
+	float lilTimer = 0;
 	public void update(float dt)
 	{
-		if(died)
+		if(worldCenter.y < -2)
 		{
-			if(!alreadyDied)
-			{
-				Array<Fixture> fixList = body.getFixtureList();
-				for(int i = 0; i < fixList.size; ++i)
-				{
-					Fixture f = fixList.get(i);
-					Filter fd = f.getFilterData();
-					fd.maskBits = Filters.scenary;
-					f.setFilterData(fd);
-				}
-				alreadyDied = true;
-			}
+			die();
+			diedTime = dieInterval;
+		}
+		if(dead)
+		{
 			diedTime += dt;
 			return;
 		}
@@ -114,12 +133,15 @@ public class Enemy {
 				flipDir = true;
 			if(sensorTouching[0] > 0)
 			{
+				lilTimer = 0;
 				body.applyLinearImpulse(0, 3f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
 			else
 			{
+				lilTimer += dt;
 				charDesiredVel = flipDir ? -5 : 5;
 			}
+			currentFrame = lilTimer < 0.2f ? 0 : 1;
 			break;
 		case Cup:
 			flipDir = worldCenter.x - gs.character.worldCenter.x > 0;
@@ -128,12 +150,31 @@ public class Enemy {
 			{
 				body.applyLinearImpulse(0, 1.8f * body.getMass(), worldCenter.x, worldCenter.y, true);
 			}
+			lilTimer += dt;
+			if(lilTimer >= (GameScene.spb * 0.5f))
+			{
+				lilTimer -=(GameScene.spb * 0.5f);
+				currentFrame = (currentFrame+1) % 2;
+			}
 			break;
 		case Pillow:
 			if(sensorTouching[1] > 0)
 				flipDir = false;
 			else if(sensorTouching[2] > 0)
 				flipDir = true;
+			if(sensorTouching[0] == 0)
+			{
+				currentFrame = 2;
+			}
+			else
+			{
+				lilTimer += dt;
+				if(lilTimer >= (GameScene.spb * 0.5f))
+				{
+					lilTimer -=(GameScene.spb * 0.5f);
+					currentFrame = (currentFrame+1) % 2;
+				}
+			}
 			float rel = gs.character.worldCenter.x - worldCenter.x;
 			if(Math.abs(rel) < 2)
 			{
@@ -145,7 +186,11 @@ public class Enemy {
 					flipDir = rel < 0;
 					charDesiredVel = flipDir ? -0.5f : 0.5f;
 					if(sensorTouching[0] > 0)
-						body.applyLinearImpulse(0, 1.1f * body.getMass(), worldCenter.x, worldCenter.y, true);
+						body.applyLinearImpulse(0, 2.3f * body.getMass(), worldCenter.x, worldCenter.y, true);
+				}
+				else
+				{
+					currentFrame = 0;
 				}
 			}
 			else
@@ -160,8 +205,8 @@ public class Enemy {
 	}
 	public void render(SpriteBatch batch)
 	{
-		tr.flip(flipDir, false);
-		batch.draw(tr, worldCenter.x - tr.getRegionWidth() * 0.5f * GameScene.unitScale, worldCenter.y - tr.getRegionHeight() * 0.5f * GameScene.unitScale, tr.getRegionWidth() * GameScene.unitScale, tr.getRegionHeight() * GameScene.unitScale);
-		tr.flip(flipDir, false);
+		animSheet[currentFrame].flip(flipDir, dead);
+		batch.draw(animSheet[currentFrame], worldCenter.x - sprW * 0.5f * GameScene.unitScale, worldCenter.y - sprH* 0.5f * GameScene.unitScale, sprW * GameScene.unitScale, sprH * GameScene.unitScale);
+		animSheet[currentFrame].flip(flipDir, dead);
 	}
 }

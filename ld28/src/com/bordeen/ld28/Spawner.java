@@ -23,12 +23,19 @@ public class Spawner {
 				gs.world.destroyBody(e.body);
 			}
 		}
-		if(spawned.size < maximum)
+		if(spawned.size < maximum && (!onlyClose || Math.abs(gs.character.pos.x - position.x) < gs.camera.camera.viewportWidth * 0.8f))
 		{
 			time += dt;
 			anim = Math.max(0, Math.min(1, time - (interval-1)));
+			if(interval-time < 0.5f && !shaken)
+			{
+				if(Math.abs(gs.character.pos.x - position.x) <= gs.camera.camera.viewportWidth / 2f)
+					gs.camera.shake(0.8f, 0.1f, 20);
+				shaken = true;
+			}
 			if(time >= interval)
 			{
+				shaken = false;
 				time -= interval;
 				spawned.add(gs.createEnemy(this));
 			}
@@ -38,6 +45,7 @@ public class Spawner {
 			anim = 0;
 		}
 	}
+	boolean shaken = false;
 	GameScene gs;
 	public void start(GameScene gs)
 	{

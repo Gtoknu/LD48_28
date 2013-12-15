@@ -10,7 +10,11 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 
 public class CCL implements ContactListener {
-
+	GameScene gs;
+	public CCL(GameScene gs)
+	{
+		this.gs = gs;
+	}
 	@Override
 	public void beginContact(Contact contact) {
 		Body bodyA = contact.getFixtureA().getBody();
@@ -19,7 +23,8 @@ public class CCL implements ContactListener {
 		{
 			if(bodyA.getUserData().getClass() == Character.class)
 			{
-				Character character = ((Character)bodyA.getUserData()); 
+				Character character = ((Character)bodyA.getUserData());
+				if(character.died) return;
 				if(contact.getFixtureA().isSensor())
 				{
 					character.footTouching++;	
@@ -32,16 +37,20 @@ public class CCL implements ContactListener {
 						{
 							Clock ck = (Clock)bodyB.getUserData();
 							ck.catched = true;
+							gs.sclock.play();
 						}
 						else if(bodyB.getUserData().getClass() == Enemy.class)
 						{
+							Enemy e =(Enemy)bodyB.getUserData();
+							if(e.isDead()) return;
 							int index = (Integer)contact.getFixtureA().getUserData();
 							if(index == 0)
-								character.died = true;
+							{
+								character.die();
+							}
 							else if (index == 1)
 							{
-								Enemy e =(Enemy)bodyB.getUserData(); 
-								e.died = true;
+								e.die();
 								Vector2 impulse = new Vector2(character.worldCenter);
 								impulse.sub(e.worldCenter);
 								impulse.nor();
@@ -60,6 +69,7 @@ public class CCL implements ContactListener {
 			else if(bodyA.getUserData().getClass() == Enemy.class)
 			{
 				Enemy e = (Enemy)bodyA.getUserData();
+				if(e.isDead()) return;
 				if(contact.getFixtureA().isSensor() && !contact.getFixtureB().isSensor())
 				{
 					int index = (Integer)contact.getFixtureA().getUserData();
@@ -72,6 +82,7 @@ public class CCL implements ContactListener {
 			if(bodyB.getUserData().getClass() == Character.class)
 			{
 				Character character = (Character)bodyB.getUserData();
+				if(character.died) return;
 				if(contact.getFixtureB().isSensor())
 				{
 					character.footTouching++;
@@ -84,16 +95,20 @@ public class CCL implements ContactListener {
 						{
 							Clock ck = (Clock)bodyA.getUserData();
 							ck.catched = true;
+							gs.sclock.play();
 						}
 						else if(bodyA.getUserData().getClass() == Enemy.class)
 						{
+							Enemy e =(Enemy)bodyA.getUserData(); 
+							if(e.isDead()) return;
 							int index = (Integer)contact.getFixtureB().getUserData();
 							if(index == 0)
-								character.died = true;
+							{
+								character.die();
+							}
 							else if (index == 1)
 							{
-								Enemy e =(Enemy)bodyA.getUserData(); 
-								e.died = true;
+								e.die();
 								Vector2 impulse = new Vector2(character.worldCenter);
 								impulse.sub(e.worldCenter);
 								impulse.nor().add(0, 0.5f).scl(-6);
@@ -108,10 +123,12 @@ public class CCL implements ContactListener {
 			}
 			else if(bodyB.getUserData().getClass() == Enemy.class)
 			{
+				Enemy e = (Enemy)bodyB.getUserData();
+				if(e.isDead()) return;
 				if(contact.getFixtureB().isSensor() && !contact.getFixtureA().isSensor())
 				{
 					int index = (Integer)contact.getFixtureB().getUserData();
-					((Enemy)bodyB.getUserData()).sensorTouching[index]++;
+					e.sensorTouching[index]++;
 				}
 			}
 		}
@@ -133,7 +150,7 @@ public class CCL implements ContactListener {
 			else if(bodyA.getUserData().getClass() == Enemy.class)
 			{
 				Enemy e = (Enemy)bodyA.getUserData();
-				if(contact.getFixtureA().isSensor() && !contact.getFixtureB().isSensor())
+				if(contact.getFixtureA().isSensor() && (contact.getFixtureB() == null || !contact.getFixtureB().isSensor()))
 				{
 					e.sensorTouching[(Integer)contact.getFixtureA().getUserData()]--;
 				}
@@ -150,7 +167,7 @@ public class CCL implements ContactListener {
 			}
 			else if(bodyB.getUserData().getClass() == Enemy.class)
 			{
-				if(contact.getFixtureB().isSensor() && !contact.getFixtureA().isSensor())
+				if(contact.getFixtureB().isSensor() && (contact.getFixtureA() == null || !contact.getFixtureA().isSensor()))
 				{
 					((Enemy)bodyB.getUserData()).sensorTouching[(Integer)contact.getFixtureB().getUserData()]--;
 				}
