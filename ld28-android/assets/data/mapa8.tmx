@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="30" height="12" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="pickleTile" tilewidth="32" tileheight="32">
+  <image source="pickleTile.png" width="512" height="32"/>
+ </tileset>
+ <objectgroup name="collision" width="30" height="12">
+  <object x="32" y="0" width="1216" height="32"/>
+  <object x="928" y="0" width="32" height="384"/>
+  <object x="0" y="0" width="32" height="384"/>
+  <object x="32" y="224" width="64" height="32"/>
+  <object x="128" y="160" width="32" height="32"/>
+  <object x="224" y="160" width="128" height="32"/>
+  <object x="320" y="192" width="32" height="32"/>
+  <object x="416" y="160" width="32" height="32"/>
+  <object x="512" y="160" width="32" height="32"/>
+  <object x="608" y="160" width="32" height="32"/>
+  <object x="320" y="256" width="192" height="32"/>
+  <object x="544" y="256" width="192" height="32"/>
+  <object x="704" y="160" width="32" height="64"/>
+  <object x="768" y="192" width="32" height="32"/>
+  <object x="800" y="224" width="32" height="32"/>
+  <object x="832" y="256" width="32" height="32"/>
+  <object x="32" y="352" width="896" height="32"/>
+  <object x="896" y="288" width="32" height="64"/>
+  <object x="864" y="320" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup name="Player start" width="30" height="12">
+  <object x="144" y="304">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <layer name="Camada de Tiles 1" width="30" height="12">
+  <data encoding="base64" compression="zlib">
+   eJwTYGBg4KEzFgBiPgb6A45RewfMXkYkNjMQc0MxLw41uNisJNqLCzARqQ5dPSMWOZC9oDQN8g8nieaSAtDtJsW/yGEOw5xEyGGzeyDSFTsD/csNmJ0wzE8njGwnAFmcBP0=
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="30" height="12">
+  <object name="Spawn" x="144" y="144">
+   <properties>
+    <property name="enemy" value="pillow"/>
+    <property name="interval" value="0.5"/>
+    <property name="maximum" value="1"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Clock" x="48" y="208">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock" x="432" y="144">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock" x="528" y="144">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock" x="624" y="144">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock" x="720" y="144">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Clock" x="528" y="304">
+   <properties>
+    <property name="type" value="clock"/>
+   </properties>
+  </object>
+  <object name="Spawn" x="432" y="208">
+   <properties>
+    <property name="enemy" value="cup"/>
+    <property name="interval" value="2"/>
+    <property name="maximum" value="3"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Spawn" x="624" y="208">
+   <properties>
+    <property name="enemy" value="cup"/>
+    <property name="interval" value="2"/>
+    <property name="maximum" value="3"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Spawn" x="528" y="208">
+   <properties>
+    <property name="enemy" value="sheep"/>
+    <property name="interval" value="4"/>
+    <property name="maximum" value="4"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+  <object name="Spawn" x="288" y="144">
+   <properties>
+    <property name="enemy" value="cup"/>
+    <property name="interval" value="3"/>
+    <property name="maximum" value="1"/>
+    <property name="type" value="spawn"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="enemyCol" width="30" height="12">
+  <object x="160" y="32" width="64" height="160"/>
+  <object x="96" y="32" width="32" height="192"/>
+  <object x="352" y="32" width="64" height="128"/>
+ </objectgroup>
+</map>

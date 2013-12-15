@@ -157,6 +157,12 @@ public class Character implements InputProcessor {
 			keyState |= KRIGHT;  flipX = false; break;
 
 		case Keys.UP:
+		case Keys.Z:
+		case Keys.X:
+		case Keys.C:
+		case Keys.A:
+		case Keys.Q:
+		case Keys.SPACE:
 			if(footTouching > 0f && jumpTimeout <= 0.8f)
 			{
 				body.applyLinearImpulse(0, 3.5f * body.getMass(), worldCenter.x, worldCenter.y, true);
@@ -183,8 +189,14 @@ public class Character implements InputProcessor {
 
 		case Keys.RIGHT:
 			keyState &= ~KRIGHT; break;
-
+			
 		case Keys.UP:
+		case Keys.Z:
+		case Keys.X:
+		case Keys.C:
+		case Keys.A:
+		case Keys.Q:
+		case Keys.SPACE:
 			keyState &= ~KUP; break;
 
 		case Keys.DOWN:

@@ -51,7 +51,7 @@ public class GameScene extends Scene implements InputProcessor {
 	Texture clock;
 	float cameraMin;
 	float cameraMax;
-	int currentLevel = 1;
+	int currentLevel = 8;
 	AssetManager assetManager;
 	TextureRegion[] backs;
 	float backCounting;
@@ -350,13 +350,6 @@ public class GameScene extends Scene implements InputProcessor {
 			enemies.get(i).update(dt);
 		}
 		
-		for(int i = enemies.size-1; i >= 0; --i)
-		{
-			if(enemies.get(i).diedTime > Enemy.dieInterval)
-			{
-				enemies.removeIndex(i);
-			}
-		}
 		
 		camera.update(dt, character);
 		
@@ -364,6 +357,16 @@ public class GameScene extends Scene implements InputProcessor {
 		for(int i = 0; i < spawners.size; ++i)
 		{
 			spawners.get(i).update(dt);
+		}
+
+		for(int i = enemies.size-1; i >= 0; --i)
+		{
+			Enemy e =enemies.get(i); 
+			if(e.diedTime > Enemy.dieInterval)
+			{
+				enemies.removeIndex(i);
+				world.destroyBody(e.body);
+			}
 		}
 		for(int i = clocks.size-1; i >= 0; --i)
 		{

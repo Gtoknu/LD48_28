@@ -17,10 +17,9 @@ public class Spawner {
 		for(int i = spawned.size-1; i >= 0; --i)
 		{
 			Enemy e =spawned.get(i); 
-			if(e.diedTime > Enemy.dieInterval)
+			if(e.isDead())
 			{
 				spawned.removeIndex(i);
-				gs.world.destroyBody(e.body);
 			}
 		}
 		if(spawned.size < maximum && (!onlyClose || Math.abs(gs.character.pos.x - position.x) < gs.camera.camera.viewportWidth * 0.8f))
