@@ -1,6 +1,8 @@
 package com.bordeen.ld28;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
@@ -14,6 +16,11 @@ public class MainMenu extends Scene implements InputProcessor {
 	TextureRegion[] logo;
 	OrthographicCamera uiCam;
 	SpriteBatch batch;
+	GameScene gs;
+	public MainMenu(GameScene gs)
+	{
+		this.gs = gs;
+	}
 	@Override
 	public void start(AssetManager assetManager) {
 		Texture sheet = assetManager.get("data/logonap.png", Texture.class);
@@ -80,6 +87,14 @@ public class MainMenu extends Scene implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		switch(keycode)
 		{
+		case Keys.R:
+			Preferences pref = Gdx.app.getPreferences("YOGONAP");
+			pref.clear();
+			pref.flush();
+			gs.currentLevel = 1;
+			nextScene = true;
+			nextSceneName = "Game";
+			break;
 		case Keys.SPACE:
 			nextScene = true;
 			nextSceneName = "Game";
@@ -115,7 +130,19 @@ public class MainMenu extends Scene implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
+		if(Gdx.app.getType() ==ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS)
+		{
+			if(screenY < Gdx.graphics.getHeight() * 0.5f)
+			{
+				Preferences pref = Gdx.app.getPreferences("YOGONAP");
+				pref.clear();
+				pref.flush();
+				gs.currentLevel = 1;	
+			}
+			nextScene = true;
+			nextSceneName = "Game";
+			
+		}
 		return false;
 	}
 

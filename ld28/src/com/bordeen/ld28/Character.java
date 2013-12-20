@@ -151,10 +151,10 @@ public class Character implements InputProcessor {
 		switch(keycode)
 		{
 		case Keys.LEFT:
-			keyState |= KLEFT; flipX = true; break;
+			Press(KLEFT); break;
 
 		case Keys.RIGHT:
-			keyState |= KRIGHT;  flipX = false; break;
+			Press(KRIGHT);  flipX = false; break;
 
 		case Keys.UP:
 		case Keys.Z:
@@ -163,20 +163,41 @@ public class Character implements InputProcessor {
 		case Keys.A:
 		case Keys.Q:
 		case Keys.SPACE:
+			Press(KUP);
+			break;
+		case Keys.DOWN:
+			Press(KDOWN);
+			keyState |= KDOWN; break;
+		default:
+			return false;
+		}
+		return true;
+	}
+	
+	void Press(int id)
+	{
+		switch(id)
+		{
+		case KLEFT:
+			 flipX = true;
+			 break;
+		case KRIGHT:
+			 flipX = false;
+			 break;
+		case KUP:
 			if(footTouching > 0f && jumpTimeout <= 0.8f)
 			{
 				body.applyLinearImpulse(0, 3.5f * body.getMass(), worldCenter.x, worldCenter.y, true);
 				jumpTimeout = 1.0f;
 				gs.jump.play();
 			}
-			keyState |= KUP;
-			break;
-		case Keys.DOWN:
-			keyState |= KDOWN; break;
-		default:
-			return false;
+			 break;
 		}
-		return true;
+		keyState |= id;
+	}
+	void Release(int id)
+	{
+		keyState &= ~id;
 	}
 
 	@Override
@@ -185,10 +206,10 @@ public class Character implements InputProcessor {
 		switch(keycode)
 		{
 		case Keys.LEFT:
-			keyState &= ~KLEFT; break;
+			Release(KLEFT); break;
 
 		case Keys.RIGHT:
-			keyState &= ~KRIGHT; break;
+			Release(KRIGHT); break;
 			
 		case Keys.UP:
 		case Keys.Z:
@@ -197,10 +218,10 @@ public class Character implements InputProcessor {
 		case Keys.A:
 		case Keys.Q:
 		case Keys.SPACE:
-			keyState &= ~KUP; break;
+			Release(KUP); break;
 
 		case Keys.DOWN:
-			keyState &= ~KDOWN; break;
+			Release(KDOWN); break;
 		default:
 			return false;
 		}

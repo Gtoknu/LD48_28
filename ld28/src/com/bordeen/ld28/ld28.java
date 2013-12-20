@@ -29,12 +29,12 @@ public class ld28 implements ApplicationListener {
 	@Override
 	public void create() {
 		assetManager = new AssetManager();
-		scenes.put("Main Menu", new MainMenu());
-		scenes.put("Game", new GameScene());
+		GameScene gs;
+		scenes.put("Game", gs = new GameScene());
+		scenes.put("Main Menu", new MainMenu(gs));
 		scenes.put("Credits", new Credits());
 		scenes.put("Instructions", new Instructions());
 		currentScene = scenes.get("Main Menu");
-		GameScene gs = (GameScene)scenes.get("Game");
 
 		Preferences pref = Gdx.app.getPreferences("YOGONAP");
 		gs.currentLevel = pref.getInteger("HigherLevel", 1);

@@ -2,6 +2,7 @@ package com.bordeen.ld28;
 
 import java.util.Iterator;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -72,10 +73,12 @@ public class GameScene extends Scene implements InputProcessor {
 	}
 	@Override
 	public void start(AssetManager assetManager) {
+		cameraUi = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cameraUi.position.set(cameraUi.viewportWidth * 0.5f, cameraUi.viewportHeight * 0.5f, 0);
+		cameraUi.update();
 		Preferences pref = Gdx.app.getPreferences("YOGONAP");
 		pref.putInteger("HigherLevel", currentLevel);
 		pref.flush();
-		currentLevel = 10;
 		clocks = new Array<Body>(false, 5);
 		backCounting = 0;
 		backIndex = 0;
@@ -240,13 +243,18 @@ public class GameScene extends Scene implements InputProcessor {
 		character.create(this, map, world, characterSheet);
 		mapRenderer = new OrthogonalTiledMapRenderer(map, unitScale, batch);
 		camera = new CameraController(w, h, mapWidth);
-		
 		imux = new InputMultiplexer();
+		if(touchListener != null)
+		{
+			touchListener.start(assetManager, character);
+			imux.addProcessor(touchListener);
+		}
 		imux.addProcessor(character);
 		imux.addProcessor(this);
 		Gdx.input.setInputProcessor(imux);
 		
 	}
+	TouchListener touchListener = null;
 	@Override
 	public void load(AssetManager assetManager) {
 		assetManager.load("data/charactersheet.png", Texture.class);
@@ -261,6 +269,12 @@ public class GameScene extends Scene implements InputProcessor {
 		kill= Gdx.audio.newSound(Gdx.files.internal("data/kill.wav"));
 		die = Gdx.audio.newSound(Gdx.files.internal("data/die.wav"));
 		sclock = Gdx.audio.newSound(Gdx.files.internal("data/clock.wav"));
+		
+		if(Gdx.app.getType() == ApplicationType.Android || Gdx.app.getType() == ApplicationType.iOS)
+		{
+			assetManager.load("data/arrows.png", Texture.class);
+			touchListener = new TouchListener();
+		}
 	}
 	@Override
 	public void end() {
@@ -285,6 +299,7 @@ public class GameScene extends Scene implements InputProcessor {
 	public final static float bps = bpm/60f;
 	public final static float spb = 1f/bps;
 	float time = 0;
+	private OrthographicCamera cameraUi;
 	@Override
 	public void render() {
 		//float dt = 1f/45f;
@@ -327,12 +342,7 @@ public class GameScene extends Scene implements InputProcessor {
 			Enemy e = enemies.get(i);
 			e.render(batch);
 		}
-		batch.end();
-		
-		mapRenderer.setView(camera.camera);
-		mapRenderer.render();
-		
-		batch.begin();
+
 		character.draw(batch);
 		
 		for(int i = 0; i < clocks.size; ++i)
@@ -341,7 +351,20 @@ public class GameScene extends Scene implements InputProcessor {
 			Vector2 p = b.getPosition();
 			batch.draw(clock, p.x - 0.5f, p.y - 0.5f, 1, 1);
 		}
+		
 		batch.end();
+		
+		mapRenderer.setView(camera.camera);
+		mapRenderer.render();
+		
+		batch.setProjectionMatrix(cameraUi.combined);
+		batch.begin();
+		if(touchListener != null)
+		{
+			touchListener.render(batch);
+		}
+		batch.end();
+		batch.setProjectionMatrix(camera.combined());
 		
 		character.update(dt);
 		if(character.diedTime > Character.dieInterval)
